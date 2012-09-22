@@ -4,6 +4,10 @@ package akdcl.skeleton.animation {
 	import akdcl.skeleton.objects.MovementBoneData;
 	import akdcl.skeleton.objects.Node;
 	
+	import akdcl.skeleton.utils.skeletonNamespace;
+	
+	use namespace skeletonNamespace;
+	
 	/**
 	 * 
 	 * @author Akdcl
@@ -107,9 +111,6 @@ package akdcl.skeleton.animation {
 							currentPrecent += currentFrame / totalFrames;
 						}
 						currentPrecent %= 1;
-						//totalDuration = 0;
-						//betweenDuration = 0;
-						//toIndex = 0;
 						break;
 					default:
 						//循环
@@ -136,14 +137,30 @@ package akdcl.skeleton.animation {
 			}
 			if(currentKeyFrame){
 				//arrived
-				bone.factory.boneKeyFrameRender(bone, currentKeyFrame);
+				var _displayIndex:int = currentKeyFrame.displayIndex;
+				bone.changeDisplay(_displayIndex);
+				if(_displayIndex >= 0){
+					if(bone.info.z != currentKeyFrame.z){
+						bone.info.z = currentKeyFrame.z;
+					}
+					if(bone.armature){
+						bone.armature.bonesIndexChanged = true;
+					}
+				}
+				
+				/*if(currentKeyFrame.event && currentKeyFrame.armature.boneEventCallback != null){
+					_bone.armature.boneEventCallback(_keyFrame.event, _bone.info.name);
+				}*/
+				/*if(_keyFrame.sound && _bone.armature.soundEventCallback != null){
+				_bone.armature.soundEventCallback(_keyFrame.sound, _keyFrame.soundEffect);
+				}*/
 				currentKeyFrame = null;
 			}
 			if(isTweenKeyFrame){
 				//to
-				if(nextKeyFrame.hide){
-					bone.recycleDisplay();
-				}
+				//if(nextKeyFrame.hide){
+					//bone.recycleDisplay();
+				//}
 				isTweenKeyFrame = false;
 			}
 		}

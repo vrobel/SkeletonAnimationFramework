@@ -14,6 +14,7 @@ package akdcl.skeleton.utils {
 		public static const ARMATURES:String = "armatures";
 		public static const ARMATURE:String = "armature";
 		public static const BONE:String = "b";
+		public static const DISPLAY:String = "d";
 
 		public static const ANIMATIONS:String = "animations";
 		public static const ANIMATION:String = "animation";
@@ -40,8 +41,7 @@ package akdcl.skeleton.utils {
 		public static const A_SCALE_X:String = "cX";
 		public static const A_SCALE_Y:String = "cY";
 		public static const A_Z:String = "z";
-		public static const A_HIDE:String = "hide";
-		public static const A_IMAGE:String = "img";
+		public static const A_DISPLAY_INDEX:String = "dI";
 		public static const A_EVENT:String = "evt";
 		public static const A_SOUND:String = "sd";
 		public static const A_SOUND_EFFECT:String = "sdE";

@@ -24,6 +24,7 @@ package starling.display
     import starling.events.Event;
     import starling.events.EventDispatcher;
     import starling.events.TouchEvent;
+    import starling.filters.FragmentFilter;
     import starling.utils.MatrixUtil;
     
     /** Dispatched when an object is added to a parent. */
@@ -130,6 +131,7 @@ package starling.display
         private var mParent:DisplayObjectContainer;  
         private var mTransformationMatrix:Matrix;
         private var mOrientationChanged:Boolean;
+        private var mFilter:FragmentFilter;
         
         /** Helper objects. */
         private static var sAncestors:Vector.<DisplayObject> = new <DisplayObject>[];
@@ -155,9 +157,10 @@ package starling.display
         }
         
         /** Disposes all resources of the display object. 
-          * GPU buffers are released, event listeners are removed. */
+          * GPU buffers are released, event listeners are removed, filters are disposed. */
         public function dispose():void
         {
+            if (mFilter) mFilter.dispose();
             removeEventListeners();
         }
         
@@ -325,6 +328,13 @@ package starling.display
             super.dispatchEvent(event);
         }
         
+        /** Indicates if an object occupies any visible area. (Which is the case when its 'alpha', 
+         *  'scaleX' and 'scaleY' values are not zero, and its 'visible' property is enabled.) */
+        public function get hasVisibleArea():Boolean
+        {
+            return mAlpha != 0.0 && mVisible && mScaleX != 0.0 && mScaleY != 0.0;
+        }
+        
         // internal methods
         
         /** @private */
@@ -342,12 +352,6 @@ package starling.display
                 mParent = value; 
         }
         
-        /** @private */
-        internal function get hasVisibleArea():Boolean
-        {
-            return mAlpha != 0.0 && mVisible && mScaleX != 0.0 && mScaleY != 0.0;
-        }
-        
         // helpers
         
         private function normalizeAngle(angle:Number):Number
@@ -363,7 +367,7 @@ package starling.display
         /** The transformation matrix of the object relative to its parent.
          *  If you assign a custom transformation matrix, Starling will figure out suitable values  
          *  for the corresponding orienation properties (<code>x, y, scaleX/Y, rotation</code> etc).
-         *  CAUTION: Returns not a copy, but the actual object! */
+         *  CAUTION: returns not a copy, but the actual object! */
         public function get transformationMatrix():Matrix
         {
             if (mOrientationChanged)
@@ -371,8 +375,8 @@ package starling.display
                 mOrientationChanged = false;
                 mTransformationMatrix.identity();
                 
-                if (mScaleX != 1.0 || mScaleY != 1.0) mTransformationMatrix.scale(mScaleX, mScaleY);
                 if (mSkewX  != 0.0 || mSkewY  != 0.0) MatrixUtil.skew(mTransformationMatrix, mSkewX, mSkewY);
+                if (mScaleX != 1.0 || mScaleY != 1.0) mTransformationMatrix.scale(mScaleX, mScaleY);
                 if (mRotation != 0.0)                 mTransformationMatrix.rotate(mRotation);
                 if (mX != 0.0 || mY != 0.0)           mTransformationMatrix.translate(mX, mY);
                 
@@ -392,6 +396,7 @@ package starling.display
         public function set transformationMatrix(matrix:Matrix):void
         {
             mOrientationChanged = false;
+            mTransformationMatrix.copyFrom(matrix);
             mX = matrix.tx;
             mY = matrix.ty;
             
@@ -599,7 +604,14 @@ package starling.display
         /** The name of the display object (default: null). Used by 'getChildByName()' of 
          *  display object containers. */
         public function get name():String { return mName; }
-        public function set name(value:String):void { mName = value; }        
+        public function set name(value:String):void { mName = value; }
+        
+        /** The filter or filter group that is attached to the display object. The starling.filters 
+         *  package contains several classes that define specific filters you can use. 
+         *  Beware that you should NOT use the same filter on more than one object (for 
+         *  performance reasons). */ 
+        public function get filter():FragmentFilter { return mFilter; }
+        public function set filter(value:FragmentFilter):void { mFilter = value; }
         
         /** The display object container that contains this display object. */
         public function get parent():DisplayObjectContainer { return mParent; }

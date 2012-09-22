@@ -7,6 +7,7 @@ package akdcl.skeleton.objects
 	 */
 	public class Node {
 		private static const DOUBLE_PI:Number = Math.PI * 2;
+		
 		public var x:Number;
 		public var y:Number;
 		public var scaleX:Number;
@@ -37,7 +38,11 @@ package akdcl.skeleton.objects
 			z = 0;
 		}
 		
-		final public function copy(_node:Node):void {
+		public function dispose():void{
+			
+		}
+		
+		public function copy(_node:Node):void {
 			x = _node.x;
 			y = _node.y;
 			scaleX = _node.scaleX;
@@ -57,27 +62,25 @@ package akdcl.skeleton.objects
 			scaleY = _to.scaleY - _from.scaleY;
 			skewX = _to.skewX - _from.skewX;
 			skewY = _to.skewY - _from.skewY;
+			
+			skewX %= DOUBLE_PI;
+			if (skewX > Math.PI) {
+				skewX -= DOUBLE_PI;
+			}
+			if (skewX < -Math.PI) {
+				skewX += DOUBLE_PI;
+			}
+			skewY %= DOUBLE_PI;
+			if (skewY > Math.PI) {
+				skewY -= DOUBLE_PI;
+			}
+			if (skewY < -Math.PI) {
+				skewY += DOUBLE_PI;
+			}
+				
 			if (_to.tweenRotate) {
 				skewX += _to.tweenRotate * DOUBLE_PI;
-			}else {
-				skewX %= DOUBLE_PI;
-				if (skewX > Math.PI) {
-					skewX -= DOUBLE_PI;
-				}
-				if (skewX < -Math.PI) {
-					skewX += DOUBLE_PI;
-				}
-			}
-			if (_to.tweenRotate) {
 				skewY += _to.tweenRotate * DOUBLE_PI;
-			}else {
-				skewY %= DOUBLE_PI;
-				if (skewY > Math.PI) {
-					skewY -= DOUBLE_PI;
-				}
-				if (skewY < -Math.PI) {
-					skewY += DOUBLE_PI;
-				}
 			}
 		}
 		

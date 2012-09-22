@@ -25,6 +25,8 @@ package akdcl.skeleton.objects
 		
 		public var texture:Object;
 		
+		public var subTextures:Object;
+		
 		private var xml:XML;
 		private var width:uint;
 		private var height:uint;
@@ -45,6 +47,8 @@ package akdcl.skeleton.objects
 			var _loaderContext:LoaderContext = new LoaderContext(false);
 			_loaderContext.allowCodeImport = true;
 			_loader.loadBytes(_byteArray, _loaderContext);
+			
+			subTextures = {};
 		}
 		
 		public function updateBitmap():void {
@@ -65,14 +69,23 @@ package akdcl.skeleton.objects
 			byteArray = null;
 			xml = null;
 			clip = null;
+			
 			if(bitmap && bitmap.bitmapData){
 				bitmap.bitmapData.dispose();
 			}
 			bitmap = null;
+			
 			if(texture && ("dispose" in texture)){
 				texture.dispose();
 			}
-			texture = null
+			texture = null;
+			
+			for each(var _subTexture:Object in subTextures){
+				if("dispose" in _subTexture){
+					_subTexture.dispose();
+				}
+			}
+			subTextures = null;
 		}
 		
 		private function onLoaderCompleteHandler(_e:Event):void {

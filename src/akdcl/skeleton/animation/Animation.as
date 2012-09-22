@@ -1,11 +1,14 @@
 package akdcl.skeleton.animation{
-	import akdcl.skeleton.utils.skeletonNamespace;
 	
 	import akdcl.skeleton.Armature;
 	import akdcl.skeleton.Bone;
+	import akdcl.skeleton.events.Event;
 	import akdcl.skeleton.objects.AnimationData;
-	import akdcl.skeleton.objects.MovementData;
 	import akdcl.skeleton.objects.MovementBoneData;
+	import akdcl.skeleton.objects.MovementData;
+	import akdcl.skeleton.utils.skeletonNamespace;
+	
+	use namespace skeletonNamespace;
 	
 	/**
 	 * 
@@ -22,18 +25,16 @@ package akdcl.skeleton.animation{
 		private var movementData:MovementData;
 		
 		private var armature:Armature;
-		private var bones:Object;
 		
 		override public function set scale(_scale:Number):void {
 			super.scale = _scale;
-			for each(var _bone:Bone in bones) {
+			for each(var _bone:Bone in armature.bones) {
 				_bone.tween.scale = _scale;
 			}
 		}
 		
 		public function Animation(_armature:Armature) {
 			armature = _armature;
-			bones = armature.skeletonNamespace::bones;
 		}
 		
 		public function setData(_animationData:AnimationData):void {
@@ -43,6 +44,13 @@ package akdcl.skeleton.animation{
 			stop();
 			animationData = _animationData;
 			movementList = animationData.getSearchList();
+		}
+		
+		public function autoPlay(_movementID:Object, _durationTo:int = -1, _durationTween:int = -1, _loop:* = null, _tweenEasing:Number = NaN):void{
+			if(movementID == _movementID as String){
+				return;
+			}
+			play(_movementID, _durationTo, _durationTween, _loop, _tweenEasing);
 		}
 		
 		override public function play(_movementID:Object, _durationTo:int = -1, _durationTween:int = -1, _loop:* = null, _tweenEasing:Number = NaN):void {
@@ -77,12 +85,12 @@ package akdcl.skeleton.animation{
 			}
 			
 			var _movementBoneData:MovementBoneData;
-			for each(var _bone:Bone in bones) {
+			for each(var _bone:Bone in armature.bones) {
 				_movementBoneData = movementData.getData(_bone.info.name);
 				if (_movementBoneData) {
 					_bone.tween.play(_movementBoneData, _durationTo, _durationTween, _loop, _tweenEasing);
 				}else {
-					_bone.recycleDisplay();
+					_bone.changeDisplay(-1);
 					_bone.tween.stop();
 				}
 			}
@@ -90,21 +98,21 @@ package akdcl.skeleton.animation{
 		
 		override public function pause():void {
 			super.pause();
-			for each(var _bone:Bone in bones) {
+			for each(var _bone:Bone in armature.bones) {
 				_bone.tween.pause();
 			}
 		}
 		
 		override public function resume():void {
 			super.resume();
-			for each(var _bone:Bone in bones) {
+			for each(var _bone:Bone in armature.bones) {
 				_bone.tween.resume();
 			}
 		}
 		
 		override public function stop():void {
 			super.stop();
-			for each(var _bone:Bone in bones) {
+			for each(var _bone:Bone in armature.bones) {
 				_bone.tween.stop();
 			}
 		}
@@ -120,28 +128,28 @@ package akdcl.skeleton.animation{
 						}else {
 							totalFrames = durationTween;
 							totalDuration = 0;
-							armature.factory.animationEventHandler(armature, "start", movementID);
+							armature.dispatchEventWith(Event.START, movementID);
 							break;
 						}
 					case LIST:
 					case SINGLE:
 						currentPrecent = 1;
 						isComplete = true;
-						armature.factory.animationEventHandler(armature, "complete", movementID);
+						armature.dispatchEventWith(Event.COMPLETE, movementID);
 						break;
 					case LIST_LOOP_START:
 						loop = 0;
 						currentPrecent %= 1;
 						totalFrames = durationTween;
 						totalDuration = 0;
-						armature.factory.animationEventHandler(armature, "start", movementID);
+						armature.dispatchEventWith(Event.START, movementID);
 						break;
 					default:
 						//继续循环
 						loop += int(currentPrecent);
 						currentPrecent %= 1;
 						totalDuration = 0;
-						armature.factory.animationEventHandler(armature, "loopComplete", movementID);
+						armature.dispatchEventWith(Event.LOOP_COMPLETE, movementID);
 						break;
 				}
 			}

@@ -20,9 +20,12 @@ package akdcl.skeleton.utils {
 			_boneData.z = int(_boneXML.attribute(ConstValues.A_Z));
 			_boneData.name = String(_boneXML.attribute(ConstValues.A_NAME));
 			_boneData.parent = String(_boneXML.attribute(ConstValues.A_PARENT));
-			_boneData.image = String(_boneXML.attribute(ConstValues.A_IMAGE));
-			_boneData.isArmature = Boolean(int(_boneXML.attribute(ConstValues.A_IS_ARMATURE)));
-			_armatureData.addData(_boneData, String(_boneXML.attribute(ConstValues.A_NAME)));
+			
+			for each(var _displayXML:XML in _boneXML.elements(ConstValues.DISPLAY)){
+				_boneData.setDisplayAt(_displayXML.attribute(ConstValues.A_NAME), Boolean(int(_displayXML.attribute(ConstValues.A_IS_ARMATURE))), _displayXML.childIndex());
+			}
+			
+			_armatureData.addData(_boneData);
 		}
 		return _armatureData;
 	}

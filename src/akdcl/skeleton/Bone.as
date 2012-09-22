@@ -1,65 +1,96 @@
 package akdcl.skeleton {
 	import akdcl.skeleton.animation.Tween;
-	import akdcl.skeleton.factorys.BaseFactory;
+	import akdcl.skeleton.events.EventDispatcher;
 	import akdcl.skeleton.objects.BoneData;
 	import akdcl.skeleton.objects.Node;
+	
+	import akdcl.skeleton.utils.skeletonNamespace;
+	
+	use namespace skeletonNamespace;
 	
 	/**
 	 * 
 	 * @author akdcl
 	 */
-	public class Bone {
+	public class Bone extends EventDispatcher {
 		public var userData:Object;
-		public var factory:BaseFactory;
 		
 		public var info:BoneData;
 		public var node:Node;
 		public var tween:Tween;
 		
-		public var armature:Armature;
-		public var parent:Bone;
+		public var originX:Number;
+		public var originY:Number;
+		public var originSkewX:Number;
+		public var originSkewY:Number;
 		
 		protected var children:Vector.<Bone>;
 		
+		skeletonNamespace var addDisplayChild:Function;
+		skeletonNamespace var removeDisplayChild:Function;
+		skeletonNamespace var updateDisplay:Function;
+		
 		private var tweenNode:Node;
 		
-		private var originX:Number;
-		private var originY:Number;
-		private var originSkewX:Number;
-		private var originSkewY:Number;
+		private var displayList:Array;
+		private var displayIndex:int = -1;
 		
-		private var displays:Object;
+		private var __armature:Armature;
+		public function get armature():Armature{
+			return __armature;
+		}
+		
+		private var __parent:Bone;
+		public function get parent():Bone{
+			return __parent;
+		}
 		
 		protected var __display:Object;
 		public function get display():Object {
 			return __display;
 		}
 		public function set display(_display:Object):void {
-			if(__display && __display == _display) {
+			if(__display == _display) {
 				return;
 			}
-			if (armature) {
-				armature.factory.displayContainer(__display);
-				armature.factory.displayContainer(_display, armature.display, info.z);
+			
+			if (__display) {
+				removeDisplayChild(__display);
+				__display = null;
+			}else if (displayList[displayIndex] is Armature) {
+				removeChild(displayList[displayIndex] as Bone);
+			}else {
+				
 			}
-			__display = _display;
+			
+			if (_display is Armature) {
+				displayList[displayIndex] = _display;
+				addChild(_display as Bone);
+			}else if (_display) {
+				displayList[displayIndex] = _display;
+				if(__armature){
+					addDisplayChild(_display, __armature.display, info.z);
+				}
+				__display = _display;
+			}else {
+				if(displayIndex >= 0){
+					displayList[displayIndex] = false;
+				}
+			}
 		}
 		
-		public function Bone(_factory:BaseFactory) {
-			factory = _factory;
-			
+		public function Bone() {
 			originX = 0;
 			originY = 0;
 			originSkewX = 0;
 			originSkewY = 0;
 			
 			info = new BoneData();
-			displays = { };
+			displayList = [];
 			
 			children = new Vector.<Bone>;
 			node = new Node();
-			node.scaleX = 0;
-			node.scaleY = 0;
+			
 			tween = new Tween(this);
 			tweenNode = tween.node;
 		}
@@ -71,64 +102,22 @@ package akdcl.skeleton {
 			originSkewY = _skewY;
 		}
 		
-		public function recycleDisplay():void {
-			if (__display) {
-				displays[info.image] = __display;
-				display = null;
-			}
-			info.hide = true;
-		}
-		
-		public function cycleDisplay(_name:String = null):Boolean {
-			if(_name){
-				if(_name == info.image){
-					if(info.hide){
-					}else{
-						return true;
-					}
-				}else{
-					if(info.hide){
-					}else{
-						recycleDisplay();
-					}
-				}
-			}else {
-				if(info.image){
-					if(info.hide){
-						_name = info.image;
-					}else{
-						return true;
-					}
-				}else{
-					return true;
-				}
-			}
-			var _display:Object = displays[_name];
-			if (_display) {
-				delete displays[_name];
-				display = _display;
-				info.image = _name;
-				info.hide = false;
-				return true;
-			}
-			return false;
-		}
-		
 		public function update():void {
-			if (armature) {
+			if (__armature) {
 				tween.update();
 				
 				var _transformX:Number = originX + node.x + tweenNode.x;
 				var _transformY:Number = originY + node.y + tweenNode.y;
 				var _transformSkewX:Number = originSkewX + node.skewX + tweenNode.skewX;
 				var _transformSkewY:Number = originSkewY + node.skewY + tweenNode.skewY;
-				if (parent.parent) {
-					var _r:Number = Math.atan2(_transformY, _transformX) + parent.info.skewY;
+				
+				if (__parent != __armature) {
+					var _r:Number = Math.atan2(_transformY, _transformX) + __parent.info.skewY;
 					var _len:Number = Math.sqrt(_transformX * _transformX + _transformY * _transformY);
-					_transformX = _len * Math.cos(_r) + parent.info.x;
-					_transformY = _len * Math.sin(_r) + parent.info.y;
-					_transformSkewX += parent.info.skewX;
-					_transformSkewY += parent.info.skewY;
+					_transformX = _len * Math.cos(_r) + __parent.info.x;
+					_transformY = _len * Math.sin(_r) + __parent.info.y;
+					_transformSkewX += __parent.info.skewX;
+					_transformSkewY += __parent.info.skewY;
 				}
 				/*
 				if(
@@ -143,10 +132,10 @@ package akdcl.skeleton {
 					info.y = _transformY;
 					info.skewX = _transformSkewX;
 					info.skewY = _transformSkewY;
-					info.scaleX = tweenNode.scaleX + node.scaleX;
-					info.scaleY = tweenNode.scaleY + node.scaleY;
+					info.scaleX = tweenNode.scaleX;
+					info.scaleY = tweenNode.scaleY;
 					if (__display) {
-						armature.factory.updateDisplay(__display, info);
+						updateDisplay(__display, info);
 					}
 				//}
 			}
@@ -157,54 +146,116 @@ package akdcl.skeleton {
 		}
 		
 		public function dispose():void{
+			for each(var _child:Bone in children){
+				_child.dispose();
+			}
+			
+			setParent(null);
+			
 			userData = null;
-			factory = null;
 			info = null;
 			node = null;
 			tween = null;
-			armature = null;
-			parent = null;
-			children = null;
 			tweenNode = null;
+			children = null;
+			
+			__armature = null;
+			__parent = null;
 			__display = null;
+			
+			displayList = null;
 		}
 		
-		internal function addChild(_child:Bone):void {
-			if (!_child) {
-				return;
-			}
-			var _parent:Bone = this;
-			while (_parent) {
-				if (_parent == _child) {
-					return;
-				}
-				_parent = _parent.parent;
-			}
+		public function addChild(_child:Bone):void {
 			if (children.indexOf(_child) < 0) {
-				if (_child.parent) {
-					_child.parent.removeChild(_child);
-				}
-				_child.parent = this;
-				_child.armature = (this as Armature) || armature;
-				_child.info.parent = info.name;
 				children.push(_child);
-				if (armature) {
-					armature.factory.displayContainer(_child.display, armature.display, info.z);
-				}
+				_child.removeFromParent();
+				_child.setParent(this);
 			}
 		}
 		
-		internal function removeChild(_child:Bone):void {
-			if (!_child) {
-				return;
-			}
+		public function removeChild(_child:Bone, _dispose:Boolean = false):void {
 			var _index:int = children.indexOf(_child);
 			if (_index >= 0) {
-				_child.parent = null;
+				_child.setParent(null);
 				children.splice(_index, 1);
-				if (armature) {
-					armature.factory.displayContainer(_child.display);
+				if(_dispose){
+					_child.dispose();
 				}
+			}else{
+				
+			}
+		}
+		
+		public function removeFromParent(_dispose:Boolean = false):void{
+			if(__parent){
+				__parent.removeChild(this, _dispose);
+			}
+		}
+		
+		private function setParent(_parent:Bone):void{
+			var _ancestor:Bone = _parent;
+			while (_ancestor != this && _ancestor != null){
+				_ancestor = _ancestor.parent;
+			}
+			
+			if (_ancestor == this){
+				throw new ArgumentError("An Bone cannot be added as a child to itself or one of its children (or children's children, etc.)");
+			}else{
+				__parent = _parent;
+			}
+			var _child:Bone;
+			if(__parent){
+				info.parent = __parent.info.name;
+				__armature = (__parent as Armature) || __parent.armature;
+				if (__armature) {
+					if(__display){
+						addDisplayChild(__display, __armature.display, info.z);
+					}
+					__armature.addToBones(this);
+					if(!this is Armature){
+						for each(_child in children){
+							if(_child.display){
+								addDisplayChild(_child.display, __armature.display, info.z);
+							}
+							__armature.addToBones(_child);
+						}
+					}
+				}
+			}else{
+				if (__armature) {
+					if(!this is Armature){
+						for each(_child in children){
+							removeDisplayChild(_child.display);
+							__armature.removeFromBones(_child);
+						}
+					}
+					removeDisplayChild(__display);
+					__armature.removeFromBones(this);
+					__armature = null;
+				}
+				info.parent = null;
+			}
+		}
+		
+		skeletonNamespace function changeDisplay(_displayIndex:int):void {
+			if(displayIndex == _displayIndex){
+				return;
+			}
+			
+			displayIndex = _displayIndex;
+			if(displayIndex < 0){
+				display = null;
+			}else{
+				var _display:Object = displayList[displayIndex];
+				if(_display){
+					display = _display;
+				}else if (_display === false) {
+					display = null;
+				}
+			}
+			if(__armature){
+				__armature.bonesIndexChanged = true;
 			}
 		}
 	}

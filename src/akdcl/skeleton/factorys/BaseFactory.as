@@ -5,6 +5,7 @@ package akdcl.skeleton.factorys {
 	import akdcl.skeleton.objects.AnimationData;
 	import akdcl.skeleton.objects.ArmatureData;
 	import akdcl.skeleton.objects.BoneData;
+	import akdcl.skeleton.objects.DisplayData;
 	import akdcl.skeleton.objects.FrameData;
 	import akdcl.skeleton.objects.Node;
 	import akdcl.skeleton.objects.SkeletonData;
@@ -13,17 +14,18 @@ package akdcl.skeleton.factorys {
 	
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
-	import flash.events.EventDispatcher;
 	import flash.geom.Matrix;
 	import flash.geom.Rectangle;
-
-	//import flash.utils.getDefinitionByName;
+	
+	import akdcl.skeleton.utils.skeletonNamespace;
+	
+	use namespace skeletonNamespace;
 	
 	/**
 	 * 
 	 * @author Akdcl
 	 */
-	public class BaseFactory extends EventDispatcher {
+	public class BaseFactory {
 		private static const matrix:Matrix = new Matrix();
 		
 		private static var __lastInstance:BaseFactory;
@@ -61,7 +63,7 @@ package akdcl.skeleton.factorys {
 		}
 		
 		public function BaseFactory(_skeletonData:SkeletonData = null):void {
-			super(this);
+			super();
 			skeletonData = _skeletonData;
 		}
 		
@@ -71,58 +73,58 @@ package akdcl.skeleton.factorys {
 				return null;
 			}
 			var _animationData:AnimationData = skeletonData.getAnimationData(_animationName || _armatureName);
-			
 			var _armature:Armature = generateArmature(_armatureName, _animationName);
-			_armature.info.name = _armatureName;
 			if (_armature) {
 				_armature.animation.setData(_animationData);
 				for each(var _boneName:String in _armatureData.getSearchList()) {
 					generateBone(_armature, _armatureData, _boneName);
 				}
-				//_armature.updateBonesZ();
 			}
 			return _armature;
 		}
 		
 		protected function generateArmature(_armatureName:String, _animationName:String = null):Armature {
-			/*var _armatureDisplay:Object;
-			var _className:String = _armatureName.split("/").join(".");
-			var _class:Class = getDefinitionByName(_className) as Class;
-			if (_class) {
-				_armatureDisplay = new _class();
-			}
-			if (!_armatureDisplay) {
-				return null;
-			}*/
-			return new Armature(new Sprite(), this);
+			var _armature:Armature = new Armature(new Sprite());
+			_armature.addDisplayChild = addDisplayChild;
+			_armature.removeDisplayChild = removeDisplayChild;
+			_armature.updateDisplay = updateDisplay;
+			_armature.info.name = _armatureName;
+			return _armature;
 		}
 		
-		protected function generateBone(_armature:Armature, _armatureData:ArmatureData, _boneName:String):void {
+		protected function generateBone(_armature:Armature, _armatureData:ArmatureData, _boneName:String):Bone {
+			if(_armature.getBone(_boneName)){
+				return null;
+			}
 			var _boneData:BoneData = _armatureData.getData(_boneName);
 			var _parentName:String = _boneData.parent;
 			if (_parentName) {
 				generateBone(_armature, _armatureData, _parentName);
 			}
-			var _bone:Bone = _armature.addBone(_boneName, _parentName, _boneData.z);
-			var _imageName:String = _boneData.image;
-			if (_imageName) {
-				if (_boneData.isArmature) {
-					var _armatureBone:Armature = buildArmature(_imageName);
-					if (_armatureBone) {
-						_bone.display = _armatureBone.display;
-					}
+			
+			var _bone:Bone = new Bone();
+			_bone.addDisplayChild = _armature.addDisplayChild;
+			_bone.removeDisplayChild = _armature.removeDisplayChild;
+			_bone.updateDisplay = _armature.updateDisplay;
+			_bone.info.copy(_boneData);
+			_bone.setOriginPosition(_boneData.x, _boneData.y, _boneData.skewX, _boneData.skewY);
+			_armature.addBone(_bone, _boneName, _parentName);
+			
+			var _length:uint = _boneData.displayLength;
+			var _displayData:DisplayData;
+			for(var _i:int = _length - 1;_i >=0;_i --){
+				_displayData = _boneData.getDisplayData(_i);
+				_bone.changeDisplay(_i);
+				if (_displayData.isArmature) {
+					_bone.display = buildArmature(_displayData.name);
 				}else {
-					_bone.display = generateBoneDisplay(_armature, _bone, _imageName);
+					_bone.display = generateBoneDisplay(_armature, _bone, _displayData.name);
 				}
 			}
-			_bone.info.image = _imageName;
-			_bone.setOriginPosition(_boneData.x, _boneData.y, _boneData.skewX, _boneData.skewY);
+			return _bone;
 		}
 		
 		public function generateBoneDisplay(_armature:Armature, _bone:Bone, _imageName:String):Object {
-			/*var _display:Object = _armature.display.getChildByName(_imageName);
-			return _display;*/
-			
 			var _display:Object;
 			var _clip:MovieClip = skeletonData.textureData.clip;
 			if (_clip) {
@@ -131,7 +133,7 @@ package akdcl.skeleton.factorys {
 				if (_clip.numChildren > 0) {
 					_display = _clip.getChildAt(0);
 					if (!_display) {
-						trace("无法获取影片剪辑，请确认骨骼 FLA 源文件导出player版本，与当前程序版本一致！");
+						trace("无法获取影片剪辑，请确认骨骼 FLA 源文件导出 player 版本，与当前程序版本一致！");
 					}
 				}
 			}else {
@@ -141,81 +143,41 @@ package akdcl.skeleton.factorys {
 			return _display;
 		}
 		
-		public function updateDisplay(_display:Object, _node:Node):void {
-			if (_display is PivotBitmap) {
-				_display.tran_x = _node.x;
-				_display.tran_y = _node.y;
-				_display.tran_skewX = _node.skewX;
-				_display.tran_skewY = _node.skewY;
-				_display.tran_scaleX = _node.scaleX;
-				_display.tran_scaleY = _node.scaleY;
-				_display.update();
-				return;
+		private static function addDisplayChild(_child:Object, _parent:Object, _index:int = -1):void {
+			if (_parent) {
+				if(_index < 0){
+					_parent.addChild(_child);
+				}else{
+					_parent.addChildAt(_child, Math.min(_index, _parent.numChildren));
+				}
 			}
-			
-			matrix.a = _node.scaleX * Math.cos(_node.skewY)
-			matrix.b = _node.scaleX * Math.sin(_node.skewY)
+		}
+		
+		private static function removeDisplayChild(_child:Object):void {
+			if(_child.parent){
+				_child.parent.removeChild(_child);
+			}
+		}
+		
+		private static function updateDisplay(_display:Object, _node:Node):void {
+			matrix.a = _node.scaleX * Math.cos(_node.skewY);
+			matrix.b = _node.scaleX * Math.sin(_node.skewY);
 			matrix.c = -_node.scaleY * Math.sin(_node.skewX);
 			matrix.d = _node.scaleY * Math.cos(_node.skewX);
 			matrix.tx = _node.x;
 			matrix.ty = _node.y;
-			_display.transform.matrix = matrix;	
-		}
-		
-		public function displayContainer(_child:Object, _parent:Object = null, _zIndex:int = -1):Object {
-			if (!_child) {
-				return null;
-			}
-			if (_parent) {
-				if(_zIndex < 0){
-					_parent.addChild(_child);
-				}else{
-					_parent.addChildAt(_child, Math.min(_zIndex, _parent.numChildren));
-				}
-			}else if(_child.parent){
-				_child.parent.removeChild(_child);
-			}
-			return _child;
-		}
-		
-		//处理hide,image,armautre,event,sound
-		public function boneKeyFrameRender(_bone:Bone, _keyFrame:FrameData):void {
-			var _image:String = _bone.info.image;
-			var _newImage:String = _keyFrame.image;
-			if (_keyFrame.hide) {
-				_bone.recycleDisplay();
+			
+			if (_display is PivotBitmap) {
+				_display.update(matrix);
 			}else{
-				if (!_bone.cycleDisplay(_newImage)) {
-					if (_keyFrame.isArmature) {
-						var _armatureBone:Armature = buildArmature(_newImage);
-						if (_armatureBone) {
-							_bone.display = _armatureBone.display;
-						}
-					}else {
-						_bone.display = generateBoneDisplay(_bone.armature, _bone, _newImage);
-					}
-					_bone.info.image = _newImage;
-					_bone.info.hide = false;
-				}
-				if(_keyFrame.z != _bone.info.z){
-					_bone.info.z = _keyFrame.z;
-					displayContainer(_bone.display, _bone.armature.display, _bone.info.z);
-				}
-			}
-			
-			if(_keyFrame.event && _bone.armature.boneEventCallback != null){
-				_bone.armature.boneEventCallback(_keyFrame.event, _bone.info.name);
-			}
-			
-			if(_keyFrame.sound && _bone.armature.soundEventCallback != null){
-				_bone.armature.soundEventCallback(_keyFrame.sound, _keyFrame.soundEffect);
+				_display.transform.matrix = matrix;
 			}
 		}
 		
-		public function animationEventHandler(_armature:Armature, _event:String, _movementID:String):void{
+		/*public function animationEventHandler(_armature:Armature, _event:String, _movementID:String):void{
 			if(_armature.armatureEventCallback != null){
 				_armature.armatureEventCallback(_event, _movementID);
 			}
-		}
+		}*/
 	}
 }

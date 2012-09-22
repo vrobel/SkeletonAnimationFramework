@@ -18,10 +18,7 @@ package akdcl.skeleton.utils {
 		);
 		_frameData.z = int(_frameXML.attribute(ConstValues.A_Z));
 		_frameData.tweenRotate = int(_frameXML.attribute(ConstValues.A_TWEEN_ROTATE));
-		
-		_frameData.hide = Boolean(int(_frameXML.attribute(ConstValues.A_HIDE)));
-		_frameData.image = String(_frameXML.attribute(ConstValues.A_IMAGE));
-		_frameData.isArmature = Boolean(int(_frameXML.attribute(ConstValues.A_IS_ARMATURE)));
+		_frameData.displayIndex = int(_frameXML.attribute(ConstValues.A_DISPLAY_INDEX));
 		_frameData.movement = String(_frameXML.attribute(ConstValues.A_MOVEMENT));
 		
 		_frameData.event = String(_frameXML.attribute(ConstValues.A_EVENT));

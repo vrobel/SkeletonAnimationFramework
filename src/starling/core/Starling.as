@@ -335,9 +335,9 @@ package starling.core
         {
             makeCurrent();
             
+            mTouchProcessor.advanceTime(passedTime);
             mStage.advanceTime(passedTime);
             mJuggler.advanceTime(passedTime);
-            mTouchProcessor.advanceTime(passedTime);
         }
         
         /** Renders the complete display list. Before rendering, the context is cleared; afterwards,
@@ -354,7 +354,9 @@ package starling.core
             if (!mShareContext)
                 RenderSupport.clear(mStage.color, 1.0);
             
-            mSupport.setOrthographicProjection(mStage.stageWidth, mStage.stageHeight);
+            mSupport.setOrthographicProjection(0, 0, mStage.stageWidth, mStage.stageHeight);
+            mSupport.renderTarget = null; // back buffer
+            
             mStage.render(mSupport, 1.0);
             mSupport.finishQuadBatch();
             
@@ -619,22 +621,21 @@ package starling.core
         public function get nativeOverlay():Sprite { return mNativeOverlay; }
         
         /** Indicates if a small statistics box (with FPS, memory usage and draw count) is displayed. */
-        public function get showStats():Boolean { return mStatsDisplay != null; }
+        public function get showStats():Boolean { return mStatsDisplay && mStatsDisplay.parent; }
         public function set showStats(value:Boolean):void
         {
-            if (mStatsDisplay && !value)
+            if (value == showStats) return;
+            
+            if (value)
             {
-                mStatsDisplay.removeFromParent(true);
-                mStatsDisplay = null;
+                if (mStatsDisplay) mStage.addChild(mStatsDisplay);
+                else               showStatsAt();
             }
-            else if (!mStatsDisplay && value)
-            {
-                showStatsAt();
-            }
+            else mStatsDisplay.removeFromParent();
         }
         
         /** Displays the statistics box at a certain position. */
-        public function showStatsAt(hAlign:String="left", vAlign:String="top"):void
+        public function showStatsAt(hAlign:String="left", vAlign:String="top", scale:Number=1):void
         {
             if (mContext == null)
             {
@@ -653,6 +654,8 @@ package starling.core
                 var stageWidth:int  = mStage.stageWidth;
                 var stageHeight:int = mStage.stageHeight;
                 
+                mStatsDisplay.scaleX = mStatsDisplay.scaleY = scale;
+                
                 if (hAlign == HAlign.LEFT) mStatsDisplay.x = 0;
                 else if (hAlign == HAlign.RIGHT) mStatsDisplay.x = stageWidth - mStatsDisplay.width; 
                 else mStatsDisplay.x = int((stageWidth - mStatsDisplay.width) / 2);
@@ -664,7 +667,7 @@ package starling.core
             
             function onRootCreated():void
             {
-                showStatsAt(hAlign, vAlign);
+                showStatsAt(hAlign, vAlign, scale);
                 removeEventListener(starling.events.Event.ROOT_CREATED, onRootCreated);
             }
         }
