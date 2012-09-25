@@ -1,19 +1,18 @@
 package akdcl.skeleton.factorys {
-	import flash.geom.Rectangle;
-	
-	import starling.display.Image;
-	import starling.display.Sprite;
-	import starling.textures.SubTexture;
-	import starling.textures.Texture;
-	
 	import akdcl.skeleton.Armature;
 	import akdcl.skeleton.Bone;
 	import akdcl.skeleton.objects.Node;
 	import akdcl.skeleton.objects.SkeletonData;
 	import akdcl.skeleton.objects.TextureData;
 	import akdcl.skeleton.utils.ConstValues;
-	
 	import akdcl.skeleton.utils.skeletonNamespace;
+	
+	import flash.geom.Rectangle;
+	
+	import starling.display.Image;
+	import starling.display.Sprite;
+	import starling.textures.SubTexture;
+	import starling.textures.Texture;
 	
 	use namespace skeletonNamespace;
 	
@@ -32,7 +31,7 @@ package akdcl.skeleton.factorys {
 		}
 		
 		public static function getTextureDisplay(_textureData:TextureData, _fullName:String):Image {
-			var _texture:XML = _textureData.getTextureXML(_fullName);
+			var _texture:XML = _textureData.getSubTextureXML(_fullName);
 			if (_texture) {
 				var _subTexture:SubTexture = _textureData.subTextures[_fullName];
 				if(!_subTexture){
@@ -53,10 +52,10 @@ package akdcl.skeleton.factorys {
 			return null;
 		}
 		
-		override public function set skeletonData(_skeletonData:SkeletonData):void {
-			super.skeletonData = _skeletonData;
-			if (skeletonData) {
-				skeletonData.textureData.updateBitmap();
+		override public function set textureData(_textureData:TextureData):void{
+			super.textureData = _textureData;
+			if(textureData){
+				textureData.updateBitmap();
 			}
 		}
 		
@@ -64,10 +63,10 @@ package akdcl.skeleton.factorys {
 			super(_skeletonData);
 		}
 		override protected function generateArmature(_armatureName:String, _animationName:String = null):Armature {
-			if (!skeletonData.textureData.texture) {
-				skeletonData.textureData.texture = Texture.fromBitmap(skeletonData.textureData.bitmap);
+			if (!textureData.texture) {
+				textureData.texture = Texture.fromBitmap(textureData.bitmap);
 				//
-				skeletonData.textureData.bitmap.bitmapData.dispose();
+				textureData.bitmap.bitmapData.dispose();
 			}
 			
 			var _armature:Armature = new Armature(new Sprite());
@@ -79,7 +78,7 @@ package akdcl.skeleton.factorys {
 		}
 		
 		override public function generateBoneDisplay(_armature:Armature, _bone:Bone, _imageName:String):Object {
-			return getTextureDisplay(skeletonData.textureData, _imageName);
+			return getTextureDisplay(textureData, _imageName);
 		}
 		
 		private static function addDisplayChild(_child:Object, _parent:Object, _index:int = -1):void {

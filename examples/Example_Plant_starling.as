@@ -2,7 +2,9 @@
 	import flash.display.Sprite;
 	import flash.utils.setTimeout;
 	
-	import akdcl.skeleton.utils.generateSkeletonData;
+	import akdcl.skeleton.objects.SkeletonAndTextureRawData;
+	import akdcl.skeleton.objects.SkeletonData;
+	import akdcl.skeleton.objects.TextureData;
 	import akdcl.skeleton.factorys.StarlingFactory;
 	
 	import starling.core.Starling;
@@ -13,9 +15,12 @@
 		private static const ResourcesData:Class;
 		
 		public function Example_Plant_starling() {
-			StarlingFactory.lastInstance.skeletonData = generateSkeletonData(new ResourcesData());
+			var _sat:SkeletonAndTextureRawData = new SkeletonAndTextureRawData(new ResourcesData());
+			StarlingFactory.lastInstance.skeletonData = new SkeletonData(_sat.skeletonXML);
+			StarlingFactory.lastInstance.textureData = new TextureData(_sat.textureXML, _sat.textureBytes);
+			_sat.dispose();
 			
-			setTimeout(starlingInit, 100);
+			setTimeout(starlingInit, 200);
 		}
 		
 		private function starlingInit():void {

@@ -5,7 +5,9 @@
 	import flash.utils.setTimeout;
 	
 	import akdcl.skeleton.Armature;
-	import akdcl.skeleton.utils.generateSkeletonData;
+	import akdcl.skeleton.objects.SkeletonAndTextureRawData;
+	import akdcl.skeleton.objects.SkeletonData;
+	import akdcl.skeleton.objects.TextureData;
 	import akdcl.skeleton.factorys.BaseFactory;
 	
     [SWF(width="800", height="600", frameRate="30", backgroundColor="#999999")]
@@ -18,7 +20,10 @@
 		private var armatures:Array;
 		
 		public function Example_Zombie_normal() {
-			BaseFactory.lastInstance.skeletonData = generateSkeletonData(new ResourcesData());
+			var _sat:SkeletonAndTextureRawData = new SkeletonAndTextureRawData(new ResourcesData());
+			BaseFactory.lastInstance.skeletonData = new SkeletonData(_sat.skeletonXML);
+			BaseFactory.lastInstance.textureData = new TextureData(_sat.textureXML, _sat.textureBytes);
+			_sat.dispose();
 			allArmatureNameList = BaseFactory.lastInstance.skeletonData.getSearchList();
 			armatures = [];
 			setTimeout(baseInit, 100);

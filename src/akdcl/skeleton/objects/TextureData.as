@@ -17,8 +17,6 @@ package akdcl.skeleton.objects
 	public class TextureData {
 		public var name:String;
 		
-		public var byteArray:ByteArray;
-		
 		public var clip:MovieClip;
 		
 		public var bitmap:Bitmap;
@@ -27,20 +25,22 @@ package akdcl.skeleton.objects
 		
 		public var subTextures:Object;
 		
-		private var xml:XML;
 		private var width:uint;
 		private var height:uint;
 		private var isClipToBMP:Boolean;
 		
+		private var __xml:XML;
+		public function get xml():XML{
+			return __xml;
+		}
+		
 		public function TextureData(_textureAtlasXML:XML, _byteArray:ByteArray, _isClipToBMP:Boolean = false) {
-			xml = _textureAtlasXML;
+			__xml = _textureAtlasXML;
 			
 			name = _textureAtlasXML.attribute(ConstValues.A_NAME);
 			width = uint(_textureAtlasXML.attribute(ConstValues.A_WIDTH));
 			height = uint(_textureAtlasXML.attribute(ConstValues.A_HEIGHT));
 			isClipToBMP = _isClipToBMP;
-			
-			byteArray = _byteArray;
 			
 			var _loader:Loader = new Loader();
 			_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoaderCompleteHandler);
@@ -60,14 +60,13 @@ package akdcl.skeleton.objects
 			isClipToBMP = true;
 		}
 		
-		public function getTextureXML(_id:String):XML {
-			return xml.elements(ConstValues.SUB_TEXTURE).(attribute(ConstValues.A_NAME) == _id)[0];
+		public function getSubTextureXML(_id:String):XML {
+			return __xml.elements(ConstValues.SUB_TEXTURE).(attribute(ConstValues.A_NAME) == _id)[0];
 		}
 		
 		public function dispose():void{
 			name = null;
-			byteArray = null;
-			xml = null;
+			__xml = null;
 			clip = null;
 			
 			if(bitmap && bitmap.bitmapData){
@@ -98,6 +97,7 @@ package akdcl.skeleton.objects
 				bitmap = _content as Bitmap;
 			}else {
 				clip = _content.getChildAt(0) as MovieClip;
+				clip.stop();
 				if (isClipToBMP) {
 					updateBitmap();
 				}

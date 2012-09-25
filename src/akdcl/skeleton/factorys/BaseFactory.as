@@ -37,7 +37,7 @@ package akdcl.skeleton.factorys {
 		}
 		
 		public static function getTextureDisplay(_textureData:TextureData, _fullName:String):PivotBitmap {
-			var _texture:XML = _textureData.getTextureXML(_fullName);
+			var _texture:XML = _textureData.getSubTextureXML(_fullName);
 			if (_texture) {
 				var _rect:Rectangle = new Rectangle(
 					int(_texture.attribute(ConstValues.A_X)), 
@@ -62,9 +62,18 @@ package akdcl.skeleton.factorys {
 			__skeletonData = _skeletonData;
 		}
 		
-		public function BaseFactory(_skeletonData:SkeletonData = null):void {
+		private var __textureData:TextureData;
+		public function get textureData():TextureData {
+			return __textureData;
+		}
+		public function set textureData(_textureData:TextureData):void {
+			__textureData = _textureData;
+		}
+		
+		public function BaseFactory(_skeletonData:SkeletonData = null, _textureData:TextureData = null):void {
 			super();
 			skeletonData = _skeletonData;
+			textureData = _textureData;
 		}
 		
 		public function buildArmature(_armatureName:String, _animationName:String = null):Armature {
@@ -126,7 +135,7 @@ package akdcl.skeleton.factorys {
 		
 		public function generateBoneDisplay(_armature:Armature, _bone:Bone, _imageName:String):Object {
 			var _display:Object;
-			var _clip:MovieClip = skeletonData.textureData.clip;
+			var _clip:MovieClip = textureData.clip;
 			if (_clip) {
 				_clip.gotoAndStop(_clip.totalFrames);
 				_clip.gotoAndStop(String(_imageName));
@@ -137,8 +146,8 @@ package akdcl.skeleton.factorys {
 					}
 				}
 			}else {
-				skeletonData.textureData.updateBitmap();
-				_display = getTextureDisplay(skeletonData.textureData, _imageName);
+				textureData.updateBitmap();
+				_display = getTextureDisplay(textureData, _imageName);
 			}
 			return _display;
 		}

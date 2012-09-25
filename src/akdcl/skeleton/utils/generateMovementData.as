@@ -11,7 +11,7 @@ package akdcl.skeleton.utils {
 			int(_movementXML.attribute(ConstValues.A_DURATION)),
 			int(_movementXML.attribute(ConstValues.A_DURATION_TO)),
 			int(_movementXML.attribute(ConstValues.A_DURATION_TWEEN)),
-			Boolean(int(_movementXML.attribute(ConstValues.A_LOOP))),
+			Boolean(int(_movementXML.attribute(ConstValues.A_LOOP)) == 1),
 			Number(_movementXML.attribute(ConstValues.A_TWEEN_EASING)[0])
 		);
 		for each(var _boneXML:XML in _movementXML.elements(ConstValues.BONE)) {

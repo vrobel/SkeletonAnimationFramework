@@ -10,8 +10,6 @@ package akdcl.skeleton.objects {
 	 * @author Akdcl
 	 */
 	final public class SkeletonData extends BaseDicData {
-		public var textureData:TextureData;
-		
 		private var animationDatas:Object;
 		
 		public function SkeletonData(_skeletonXML:XML) {
@@ -22,12 +20,28 @@ package akdcl.skeleton.objects {
 			}
 		}
 		
+		override public function dispose():void{
+			super.dispose();
+			for each(var _data:AnimationData in animationDatas){
+				_data.dispose();
+			}
+			animationDatas = null;
+		}
+		
 		public function getArmatureData(_name:String):ArmatureData {
 			return datas[_name];
 		}
 		
 		public function getAnimationData(_name:String):AnimationData {
 			return animationDatas[_name];
+		}
+		
+		public function addAnimationData(_data:AnimationData, _id:String = null):void{
+			_id = _id || _data.name;
+			if (animationDatas[_id]) {
+				animationDatas[_id].dispose();
+			}
+			animationDatas[_id] = _data;
 		}
 		
 		public function setData(_skeletonXML:XML):void {
@@ -37,10 +51,8 @@ package akdcl.skeleton.objects {
 				addData(generateArmatureData(_armatureXML));
 			}
 			
-			var _animationData:AnimationData;
 			for each(var _animationXML:XML in _skeletonXML.elements(ConstValues.ANIMATIONS).elements(ConstValues.ANIMATION)) {
-				_animationData = generateAnimationData(_animationXML);
-				animationDatas[_animationData.name] = _animationData;
+				addAnimationData(generateAnimationData(_animationXML));
 			}
 		}
 	}

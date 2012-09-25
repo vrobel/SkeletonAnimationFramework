@@ -14,8 +14,9 @@ package akdcl.skeleton.objects {
 		
 		public function addData(_data:Object, _id:String = null):void {
 			_id = _id || _data.name;
-			if (datas[_id]) {
-				datas[_id].dispose();
+			var _exData:Object = datas[_id];
+			if (_exData) {
+				_exData.dispose();
 			}
 			datas[_id] = _data;
 		}
@@ -30,6 +31,11 @@ package akdcl.skeleton.objects {
 		
 		public function dispose():void {
 			name = null;
+			for each(var _data:Object in datas){
+				if("dispose" in _data){
+					_data.dispose();
+				}
+			}
 			datas = null;
 		}
 	}

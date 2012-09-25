@@ -142,9 +142,9 @@ package akdcl.skeleton.animation {
 				if(_displayIndex >= 0){
 					if(bone.info.z != currentKeyFrame.z){
 						bone.info.z = currentKeyFrame.z;
-					}
-					if(bone.armature){
-						bone.armature.bonesIndexChanged = true;
+						if(bone.armature){
+							bone.armature.bonesIndexChanged = true;
+						}
 					}
 				}
 				
@@ -158,9 +158,12 @@ package akdcl.skeleton.animation {
 			}
 			if(isTweenKeyFrame){
 				//to
-				//if(nextKeyFrame.hide){
-					//bone.recycleDisplay();
-				//}
+				/*if(nextKeyFrame.displayIndex < 0){
+					//bone.changeDisplay(nextKeyFrame.displayIndex);
+					if(bone.armature){
+						//bone.armature.bonesIndexChanged = true;
+					}
+				}*/
 				isTweenKeyFrame = false;
 			}
 		}
@@ -189,7 +192,7 @@ package akdcl.skeleton.animation {
 			var _to:FrameData;
 			var _isListEnd:Boolean;
 			//播放头到达当前帧的前面或后面则重新寻找当前帧
-			if (_played <= totalDuration - betweenDuration || _played > totalDuration) {
+			if (_played >= totalDuration || _played < totalDuration - betweenDuration) {
 				do {
 					betweenDuration = movementBoneData.getData(toIndex).duration;
 					totalDuration += betweenDuration;
