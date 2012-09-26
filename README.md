@@ -6,12 +6,10 @@ This is a 2D skeleton animation framwork. It's defined for common 2D display eng
 These are some demos for a quick view:
 
 http://akdcl.sinaapp.com/example.html
-
 http://dragonbones.github.com
 
 
 For more information, please visit:
-
 https://github.com/DragonBones/SkeletonAnimationFramework/wiki
 
 Copyright 2012 The DragonBones Team
