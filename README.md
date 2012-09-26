@@ -8,4 +8,5 @@ http://dragonbones.github.com
 
 For more information, please visit:
 https://github.com/DragonBones/SkeletonAnimationFramework/wiki
+
 Copyright 2012 The DragonBones Team
