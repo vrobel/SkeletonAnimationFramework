@@ -12,13 +12,18 @@ package akdcl.skeleton.objects {
 			datas = { };
 		}
 		
-		public function addData(_data:Object, _id:String = null):void {
+		public function addData(_data:Object, _id:String = null, _replaceIfExists:Boolean = false):Boolean {
 			_id = _id || _data.name;
 			var _exData:Object = datas[_id];
 			if (_exData) {
-				_exData.dispose();
+				if(_replaceIfExists){
+					_exData.dispose();
+				}else{
+					return false;
+				}
 			}
 			datas[_id] = _data;
+			return true;
 		}
 		
 		public function getSearchList():Array {

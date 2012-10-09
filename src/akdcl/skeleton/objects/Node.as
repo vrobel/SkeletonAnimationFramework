@@ -30,8 +30,8 @@ package akdcl.skeleton.objects
 			y = _y || 0;
 			skewX = _skewX || 0;
 			skewY = _skewY || 0;
-			scaleX = _scaleX || 1;
-			scaleY = _scaleY || 1;
+			scaleX = _scaleX;
+			scaleY = _scaleY;
 			
 			tweenRotate = 0;
 			
@@ -86,7 +86,7 @@ package akdcl.skeleton.objects
 		
 		public function toString():String {
 			var _str:String = "";
-			_str += "x:" + x + " y:" + y + " rotation:" + rotation;
+			_str += "x:" + x + " y:" + y + " skewX:" + skewX + " skewY:" + skewY + " scaleX:" + scaleX + " scaleY:" + scaleY;
 			return _str;
 		}
 		

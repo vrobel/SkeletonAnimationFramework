@@ -11,13 +11,12 @@ package akdcl.skeleton.factorys {
 	import akdcl.skeleton.objects.SkeletonData;
 	import akdcl.skeleton.objects.TextureData;
 	import akdcl.skeleton.utils.ConstValues;
+	import akdcl.skeleton.utils.skeletonNamespace;
 	
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.geom.Matrix;
 	import flash.geom.Rectangle;
-	
-	import akdcl.skeleton.utils.skeletonNamespace;
 	
 	use namespace skeletonNamespace;
 	
@@ -97,7 +96,7 @@ package akdcl.skeleton.factorys {
 			_armature.addDisplayChild = addDisplayChild;
 			_armature.removeDisplayChild = removeDisplayChild;
 			_armature.updateDisplay = updateDisplay;
-			_armature.info.name = _armatureName;
+			_armature.origin.name = _armatureName;
 			return _armature;
 		}
 		
@@ -115,8 +114,8 @@ package akdcl.skeleton.factorys {
 			_bone.addDisplayChild = _armature.addDisplayChild;
 			_bone.removeDisplayChild = _armature.removeDisplayChild;
 			_bone.updateDisplay = _armature.updateDisplay;
-			_bone.info.copy(_boneData);
-			_bone.setOriginPosition(_boneData.x, _boneData.y, _boneData.skewX, _boneData.skewY);
+			_bone.origin.copy(_boneData);
+			
 			_armature.addBone(_bone, _boneName, _parentName);
 			
 			var _length:uint = _boneData.displayLength;
@@ -168,13 +167,13 @@ package akdcl.skeleton.factorys {
 			}
 		}
 		
-		private static function updateDisplay(_display:Object, _node:Node):void {
-			matrix.a = _node.scaleX * Math.cos(_node.skewY);
-			matrix.b = _node.scaleX * Math.sin(_node.skewY);
-			matrix.c = -_node.scaleY * Math.sin(_node.skewX);
-			matrix.d = _node.scaleY * Math.cos(_node.skewX);
-			matrix.tx = _node.x;
-			matrix.ty = _node.y;
+		private static function updateDisplay(_display:Object, _x:Number, _y:Number, _skewX:Number, _skewY:Number, _scaleX:Number, _scaleY:Number):void {
+			matrix.a = _scaleX * Math.cos(_skewY);
+			matrix.b = _scaleX * Math.sin(_skewY);
+			matrix.c = -_scaleY * Math.sin(_skewX);
+			matrix.d = _scaleY * Math.cos(_skewX);
+			matrix.tx = _x;
+			matrix.ty = _y;
 			
 			if (_display is PivotBitmap) {
 				_display.update(matrix);
@@ -182,11 +181,5 @@ package akdcl.skeleton.factorys {
 				_display.transform.matrix = matrix;
 			}
 		}
-		
-		/*public function animationEventHandler(_armature:Armature, _event:String, _movementID:String):void{
-			if(_armature.armatureEventCallback != null){
-				_armature.armatureEventCallback(_event, _movementID);
-			}
-		}*/
 	}
 }

@@ -15,14 +15,16 @@ package akdcl.skeleton {
 	public class Bone extends EventDispatcher {
 		public var userData:Object;
 		
-		public var info:BoneData;
+		public var origin:BoneData;
 		public var node:Node;
 		public var tween:Tween;
 		
-		public var originX:Number;
-		public var originY:Number;
-		public var originSkewX:Number;
-		public var originSkewY:Number;
+		public var globalX:Number;
+		public var globalY:Number;
+		public var globalSkewX:Number;
+		public var globalSkewY:Number;
+		public var globalScaleX:Number;
+		public var globalScaleY:Number;
 		
 		protected var children:Vector.<Bone>;
 		
@@ -69,7 +71,7 @@ package akdcl.skeleton {
 			}else if (_display) {
 				displayList[displayIndex] = _display;
 				if(__armature){
-					addDisplayChild(_display, __armature.display, info.z);
+					addDisplayChild(_display, __armature.display, origin.z);
 				}
 				__display = _display;
 			}else {
@@ -79,13 +81,36 @@ package akdcl.skeleton {
 			}
 		}
 		
-		public function Bone() {
-			originX = 0;
-			originY = 0;
-			originSkewX = 0;
-			originSkewY = 0;
+		skeletonNamespace function changeDisplay(_displayIndex:int):void {
+			if(displayIndex == _displayIndex){
+				return;
+			}
 			
-			info = new BoneData();
+			displayIndex = _displayIndex;
+			if(displayIndex < 0){
+				display = null;
+			}else{
+				var _display:Object = displayList[displayIndex];
+				if(_display){
+					display = _display;
+				}else if (_display === false) {
+					display = null;
+				}
+			}
+			if(__armature){
+				__armature.bonesIndexChanged = true;
+			}
+		}
+		
+		public function Bone() {
+			globalX = 0;
+			globalY = 0;
+			globalSkewX = 0;
+			globalSkewY = 0;
+			globalScaleX = 0;
+			globalScaleY = 0;
+			
+			origin = new BoneData();
 			displayList = [];
 			
 			children = new Vector.<Bone>;
@@ -95,49 +120,46 @@ package akdcl.skeleton {
 			tweenNode = tween.node;
 		}
 		
-		public function setOriginPosition(_x:Number, _y:Number, _skewX:Number = 0, _skewY:Number = 0):void {
-			originX = _x;
-			originY = _y;
-			originSkewX = _skewX;
-			originSkewY = _skewY;
-		}
-		
 		public function update():void {
 			if (__armature) {
 				tween.update();
 				
-				var _transformX:Number = originX + node.x + tweenNode.x;
-				var _transformY:Number = originY + node.y + tweenNode.y;
-				var _transformSkewX:Number = originSkewX + node.skewX + tweenNode.skewX;
-				var _transformSkewY:Number = originSkewY + node.skewY + tweenNode.skewY;
+				var _transformX:Number = origin.x + node.x + tweenNode.x;
+				var _transformY:Number = origin.y + node.y + tweenNode.y;
+				var _transformSkewX:Number = origin.skewX + node.skewX + tweenNode.skewX;
+				var _transformSkewY:Number = origin.skewY + node.skewY + tweenNode.skewY;
 				
 				if (__parent != __armature) {
-					var _r:Number = Math.atan2(_transformY, _transformX) + __parent.info.skewY;
+					var _r:Number = Math.atan2(_transformY, _transformX) + __parent.globalSkewY;
 					var _len:Number = Math.sqrt(_transformX * _transformX + _transformY * _transformY);
-					_transformX = _len * Math.cos(_r) + __parent.info.x;
-					_transformY = _len * Math.sin(_r) + __parent.info.y;
-					_transformSkewX += __parent.info.skewX;
-					_transformSkewY += __parent.info.skewY;
+					_transformX = _len * Math.cos(_r) + __parent.globalX;
+					_transformY = _len * Math.sin(_r) + __parent.globalY;
+					_transformSkewX += __parent.globalSkewX;
+					_transformSkewY += __parent.globalSkewY;
 				}
 				/*
 				if(
-					info.x != _transformX ||
-					info.y != _transformY ||
-					info.skewX != _transformSkewX ||
-					info.skewY != _transformSkewY ||
-					info.scaleX != tweenNode.scaleX ||
-					info.scaleY != tweenNode.scaleY
+					globalX != _transformX ||
+					globalY != _transformY ||
+					globalSkewX != _transformSkewX ||
+					globalSkewY != _transformSkewY ||
+					globalScaleX != tweenNode.scaleX ||
+					globalScaleY != tweenNode.scaleY
 				){*/
-					info.x = _transformX;
-					info.y = _transformY;
-					info.skewX = _transformSkewX;
-					info.skewY = _transformSkewY;
-					info.scaleX = tweenNode.scaleX;
-					info.scaleY = tweenNode.scaleY;
+					globalX = _transformX;
+					globalY = _transformY;
+					globalSkewX = _transformSkewX;
+					globalSkewY = _transformSkewY;
+					globalScaleX = tweenNode.scaleX;
+					globalScaleY = tweenNode.scaleY;
 					if (__display) {
-						updateDisplay(__display, info);
+						updateDisplay(__display, globalX, globalY, globalSkewX, globalSkewY, globalScaleX, globalScaleY);
 					}
 				//}
+			}
+			
+			if(origin.name == "头"){
+				//trace(origin, origin.parent, parent?parent.origin.name:"!!!!!");
 			}
 			
 			for each(var _child:Bone in children) {
@@ -153,7 +175,7 @@ package akdcl.skeleton {
 			setParent(null);
 			
 			userData = null;
-			info = null;
+			origin = null;
 			node = null;
 			tween = null;
 			tweenNode = null;
@@ -206,17 +228,17 @@ package akdcl.skeleton {
 			}
 			var _child:Bone;
 			if(__parent){
-				info.parent = __parent.info.name;
+				origin.parent = __parent.origin.name;
 				__armature = (__parent as Armature) || __parent.armature;
 				if (__armature) {
 					if(__display){
-						addDisplayChild(__display, __armature.display, info.z);
+						addDisplayChild(__display, __armature.display, origin.z);
 					}
 					__armature.addToBones(this);
 					if(!this is Armature){
 						for each(_child in children){
 							if(_child.display){
-								addDisplayChild(_child.display, __armature.display, info.z);
+								addDisplayChild(_child.display, __armature.display, origin.z);
 							}
 							__armature.addToBones(_child);
 						}
@@ -230,32 +252,13 @@ package akdcl.skeleton {
 							__armature.removeFromBones(_child);
 						}
 					}
-					removeDisplayChild(__display);
+					if(__display){
+						removeDisplayChild(__display);
+					}
 					__armature.removeFromBones(this);
 					__armature = null;
 				}
-				info.parent = null;
-			}
-		}
-		
-		skeletonNamespace function changeDisplay(_displayIndex:int):void {
-			if(displayIndex == _displayIndex){
-				return;
-			}
-			
-			displayIndex = _displayIndex;
-			if(displayIndex < 0){
-				display = null;
-			}else{
-				var _display:Object = displayList[displayIndex];
-				if(_display){
-					display = _display;
-				}else if (_display === false) {
-					display = null;
-				}
-			}
-			if(__armature){
-				__armature.bonesIndexChanged = true;
+				origin.parent = null;
 			}
 		}
 	}

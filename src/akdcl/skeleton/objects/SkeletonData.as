@@ -1,9 +1,9 @@
 package akdcl.skeleton.objects {
-	import flash.utils.ByteArray;
-	
 	import akdcl.skeleton.utils.ConstValues;
-	import akdcl.skeleton.utils.generateArmatureData;
 	import akdcl.skeleton.utils.generateAnimationData;
+	import akdcl.skeleton.utils.generateArmatureData;
+	
+	import flash.utils.ByteArray;
 	
 	/**
 	 * 
@@ -47,12 +47,15 @@ package akdcl.skeleton.objects {
 		public function setData(_skeletonXML:XML):void {
 			name = _skeletonXML.attribute(ConstValues.A_NAME);
 			
+			var _dataName:String;
 			for each(var _armatureXML:XML in _skeletonXML.elements(ConstValues.ARMATURES).elements(ConstValues.ARMATURE)) {
-				addData(generateArmatureData(_armatureXML));
+				_dataName = _armatureXML.attribute(ConstValues.A_NAME);
+				addData(generateArmatureData(_dataName, _armatureXML), _dataName);
 			}
 			
 			for each(var _animationXML:XML in _skeletonXML.elements(ConstValues.ANIMATIONS).elements(ConstValues.ANIMATION)) {
-				addAnimationData(generateAnimationData(_animationXML));
+				_dataName = _animationXML.attribute(ConstValues.A_NAME);
+				addAnimationData(generateAnimationData(_dataName, _animationXML, getArmatureData(_dataName)), _dataName);
 			}
 		}
 	}

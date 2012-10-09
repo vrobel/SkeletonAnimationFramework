@@ -138,15 +138,15 @@ package akdcl.skeleton.animation {
 			if(currentKeyFrame){
 				//arrived
 				var _displayIndex:int = currentKeyFrame.displayIndex;
-				bone.changeDisplay(_displayIndex);
 				if(_displayIndex >= 0){
-					if(bone.info.z != currentKeyFrame.z){
-						bone.info.z = currentKeyFrame.z;
+					if(bone.origin.z != currentKeyFrame.z){
+						bone.origin.z = currentKeyFrame.z;
 						if(bone.armature){
 							bone.armature.bonesIndexChanged = true;
 						}
 					}
 				}
+				bone.changeDisplay(_displayIndex);
 				
 				/*if(currentKeyFrame.event && currentKeyFrame.armature.boneEventCallback != null){
 					_bone.armature.boneEventCallback(_keyFrame.event, _bone.info.name);

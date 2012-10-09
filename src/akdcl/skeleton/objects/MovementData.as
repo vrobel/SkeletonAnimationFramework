@@ -11,8 +11,11 @@ package akdcl.skeleton.objects {
 		public var loop:Boolean;
 		public var tweenEasing:Number;
 		
-		public function MovementData(_name:String = null, _duration:int = 1, _durationTo:int = 0, _durationTween:int = 0, _loop:Boolean = false, _tweenEasing:Number = NaN) {
+		public function MovementData(_name:String = null) {
 			super(_name);
+		}
+		
+		public function setValues(_duration:int = 1, _durationTo:int = 0, _durationTween:int = 0, _loop:Boolean = false, _tweenEasing:Number = NaN):void{
 			duration = _duration > 0?_duration:1;
 			durationTo = _durationTo >= 0?_durationTo:0;
 			durationTween = _durationTween >= 0?_durationTween:0;

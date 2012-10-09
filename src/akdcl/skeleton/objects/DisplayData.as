@@ -1,5 +1,6 @@
 package akdcl.skeleton.objects
 {
+	
 	public final class DisplayData
 	{
 		public var name:String;

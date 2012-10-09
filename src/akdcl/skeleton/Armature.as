@@ -48,7 +48,7 @@ package akdcl.skeleton {
 		}
 
 		public function addBone(_bone:Bone, _boneName:String = null, _parentName:String = null):void {
-			_bone.info.name = _boneName || _bone.info.name;
+			_bone.origin.name = _boneName || _bone.origin.name;
 			var _boneParent:Bone = bones[_parentName];
 			if (_boneParent) {
 				_boneParent.addChild(_bone);
@@ -65,7 +65,7 @@ package akdcl.skeleton {
 		}
 		
 		skeletonNamespace function addToBones(_bone:Bone):void{
-			var _boneName:String = _bone.info.name;
+			var _boneName:String = _bone.origin.name;
 			if(_boneName){
 				var _boneAdded:Bone = bones[_boneName];
 				if (_boneAdded) {
@@ -75,7 +75,7 @@ package akdcl.skeleton {
 		}
 		
 		skeletonNamespace function removeFromBones(_bone:Bone):void{
-			var _boneName:String = _bone.info.name;
+			var _boneName:String = _bone.origin.name;
 			if(_boneName){
 				delete bones[_boneName];
 			}
@@ -97,7 +97,7 @@ package akdcl.skeleton {
 		}
 		
 		private function sortBoneZIndex(_bone1:Bone, _bone2:Bone):int {
-			return _bone1.info.z > _bone2.info.z?1: -1;
+			return _bone1.origin.z > _bone2.origin.z?1: -1;
 		}
 	}
 }

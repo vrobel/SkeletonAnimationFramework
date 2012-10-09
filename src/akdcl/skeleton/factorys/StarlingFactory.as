@@ -73,7 +73,7 @@ package akdcl.skeleton.factorys {
 			_armature.addDisplayChild = addDisplayChild;
 			_armature.removeDisplayChild = removeDisplayChild;
 			_armature.updateDisplay = updateDisplay;
-			_armature.info.name = _armatureName;
+			_armature.origin.name = _armatureName;
 			return _armature;
 		}
 		
@@ -97,13 +97,13 @@ package akdcl.skeleton.factorys {
 			}
 		}
 		
-		private static function updateDisplay(_display:Object, _node:Node):void {
-			_display.x = _node.x;
-			_display.y = _node.y;
-			_display.skewX = _node.skewX;
-			_display.skewY = _node.skewY;
-			_display.scaleX = _node.scaleX;
-			_display.scaleY = _node.scaleY;
+		private static function updateDisplay(_display:Object, _x:Number, _y:Number, _skewX:Number, _skewY:Number, _scaleX:Number, _scaleY:Number
+			_display.x = _x;
+			_display.y = _y;
+			_display.skewX = _skewX;
+			_display.skewY = _skewY;
+			_display.scaleX = _scaleX;
+			_display.scaleY = _scaleY;
 		}
 	}
 }

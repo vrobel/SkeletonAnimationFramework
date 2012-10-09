@@ -86,7 +86,7 @@ package akdcl.skeleton.animation{
 			
 			var _movementBoneData:MovementBoneData;
 			for each(var _bone:Bone in armature.bones) {
-				_movementBoneData = movementData.getData(_bone.info.name);
+				_movementBoneData = movementData.getData(_bone.origin.name);
 				if (_movementBoneData) {
 					_bone.tween.play(_movementBoneData, _durationTo, _durationTween, _loop, _tweenEasing);
 				}else {
