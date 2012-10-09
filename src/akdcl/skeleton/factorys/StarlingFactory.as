@@ -97,7 +97,15 @@ package akdcl.skeleton.factorys {
 			}
 		}
 		
-		private static function updateDisplay(_display:Object, _x:Number, _y:Number, _skewX:Number, _skewY:Number, _scaleX:Number, _scaleY:Number
+		private static function updateDisplay(
+			_display:Object, 
+			_x:Number, 
+			_y:Number, 
+			_skewX:Number, 
+			_skewY:Number, 
+			_scaleX:Number, 
+			_scaleY:Number
+		):void{
 			_display.x = _x;
 			_display.y = _y;
 			_display.skewX = _skewX;
