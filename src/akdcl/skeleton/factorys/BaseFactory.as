@@ -167,7 +167,15 @@ package akdcl.skeleton.factorys {
 			}
 		}
 		
-		private static function updateDisplay(_display:Object, _x:Number, _y:Number, _skewX:Number, _skewY:Number, _scaleX:Number, _scaleY:Number):void {
+		private static function updateDisplay(
+			_display:Object, 
+			_x:Number, 
+			_y:Number, 
+			_skewX:Number, 
+			_skewY:Number, 
+			_scaleX:Number, 
+			_scaleY:Number
+		):void {
 			matrix.a = _scaleX * Math.cos(_skewY);
 			matrix.b = _scaleX * Math.sin(_skewY);
 			matrix.c = -_scaleY * Math.sin(_skewX);
