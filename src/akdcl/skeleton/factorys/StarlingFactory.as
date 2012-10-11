@@ -1,11 +1,13 @@
 package akdcl.skeleton.factorys {
 	import akdcl.skeleton.Armature;
 	import akdcl.skeleton.Bone;
+	import akdcl.skeleton.display.StarlingBridgeImage;
 	import akdcl.skeleton.objects.Node;
 	import akdcl.skeleton.objects.SkeletonData;
 	import akdcl.skeleton.objects.TextureData;
 	import akdcl.skeleton.utils.ConstValues;
 	import akdcl.skeleton.utils.skeletonNamespace;
+	import flash.geom.Matrix;
 	
 	import flash.geom.Rectangle;
 	
@@ -17,7 +19,7 @@ package akdcl.skeleton.factorys {
 	use namespace skeletonNamespace;
 	
 	/**
-	 * 
+	 *
 	 * @author Akdcl
 	 */
 	public class StarlingFactory extends BaseFactory {
@@ -36,17 +38,17 @@ package akdcl.skeleton.factorys {
 				var _subTexture:SubTexture = _textureData.subTextures[_fullName];
 				if(!_subTexture){
 					var _rect:Rectangle = new Rectangle(
-						int(_texture.attribute(ConstValues.A_X)), 
-						int(_texture.attribute(ConstValues.A_Y)), 
-						int(_texture.attribute(ConstValues.A_WIDTH)), 
+						int(_texture.attribute(ConstValues.A_X)),
+						int(_texture.attribute(ConstValues.A_Y)),
+						int(_texture.attribute(ConstValues.A_WIDTH)),
 						int(_texture.attribute(ConstValues.A_HEIGHT))
 					);
 					_subTexture = new SubTexture(_textureData.texture as Texture, _rect);
 					_textureData.subTextures[_fullName] = _subTexture;
 				}
-				var _img:Image = new Image(_subTexture);
-				_img.pivotX = int(_texture.attribute(ConstValues.A_PIVOT_X));
-				_img.pivotY = int(_texture.attribute(ConstValues.A_PIVOT_Y));
+				var _img:StarlingBridgeImage = new StarlingBridgeImage(_subTexture);
+				_img.pX = int(_texture.attribute(ConstValues.A_PIVOT_X));
+				_img.pY = int(_texture.attribute(ConstValues.A_PIVOT_Y));
 				return _img;
 			}
 			return null;
@@ -97,21 +99,8 @@ package akdcl.skeleton.factorys {
 			}
 		}
 		
-		private static function updateDisplay(
-			_display:Object, 
-			_x:Number, 
-			_y:Number, 
-			_skewX:Number, 
-			_skewY:Number, 
-			_scaleX:Number, 
-			_scaleY:Number
-		):void{
-			_display.x = _x;
-			_display.y = _y;
-			_display.skewX = _skewX;
-			_display.skewY = _skewY;
-			_display.scaleX = _scaleX;
-			_display.scaleY = _scaleY;
+		private static function updateDisplay(_display:Image, matrix:Matrix):void {
+			_display.transformationMatrix = matrix;
 		}
 	}
 }

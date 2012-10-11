@@ -3,13 +3,14 @@ package akdcl.skeleton {
 	import akdcl.skeleton.events.EventDispatcher;
 	import akdcl.skeleton.objects.BoneData;
 	import akdcl.skeleton.objects.Node;
+	import flash.geom.Matrix;
 	
 	import akdcl.skeleton.utils.skeletonNamespace;
 	
 	use namespace skeletonNamespace;
 	
 	/**
-	 * 
+	 *
 	 * @author akdcl
 	 */
 	public class Bone extends EventDispatcher {
@@ -19,12 +20,8 @@ package akdcl.skeleton {
 		public var node:Node;
 		public var tween:Tween;
 		
-		public var globalX:Number;
-		public var globalY:Number;
-		public var globalSkewX:Number;
-		public var globalSkewY:Number;
-		public var globalScaleX:Number;
-		public var globalScaleY:Number;
+		protected var _globalTransformMatrix:Matrix = new Matrix;
+		protected var _transformMatrixForChildren:Matrix = new Matrix;
 		
 		protected var children:Vector.<Bone>;
 		
@@ -103,12 +100,6 @@ package akdcl.skeleton {
 		}
 		
 		public function Bone() {
-			globalX = 0;
-			globalY = 0;
-			globalSkewX = 0;
-			globalSkewY = 0;
-			globalScaleX = 0;
-			globalScaleY = 0;
 			
 			origin = new BoneData();
 			displayList = [];
@@ -129,33 +120,43 @@ package akdcl.skeleton {
 				var _transformSkewX:Number = origin.skewX + node.skewX + tweenNode.skewX;
 				var _transformSkewY:Number = origin.skewY + node.skewY + tweenNode.skewY;
 				
-				if (__parent != __armature) {
-					var _r:Number = Math.atan2(_transformY, _transformX) + __parent.globalSkewY;
-					var _len:Number = Math.sqrt(_transformX * _transformX + _transformY * _transformY);
-					_transformX = _len * Math.cos(_r) + __parent.globalX;
-					_transformY = _len * Math.sin(_r) + __parent.globalY;
-					_transformSkewX += __parent.globalSkewX;
-					_transformSkewY += __parent.globalSkewY;
+				
+				//Note: this formula of transform is defined by Flash pro
+				var cosX:Number = Math.cos(_transformSkewX);
+				var sinX:Number = Math.sin(_transformSkewX);
+				var cosY:Number = Math.cos(_transformSkewY);
+				var sinY:Number = Math.sin(_transformSkewY);
+				
+				if (__display)
+				{
+					_globalTransformMatrix.a = tweenNode.scaleX * cosY;
+					_globalTransformMatrix.b = tweenNode.scaleX * sinY;
+					_globalTransformMatrix.c = -tweenNode.scaleY * sinX;
+					_globalTransformMatrix.d = tweenNode.scaleY * cosX;
+					_globalTransformMatrix.tx = _transformX;
+					_globalTransformMatrix.ty = _transformY;
 				}
-				/*
-				if(
-					globalX != _transformX ||
-					globalY != _transformY ||
-					globalSkewX != _transformSkewX ||
-					globalSkewY != _transformSkewY ||
-					globalScaleX != tweenNode.scaleX ||
-					globalScaleY != tweenNode.scaleY
-				){*/
-					globalX = _transformX;
-					globalY = _transformY;
-					globalSkewX = _transformSkewX;
-					globalSkewY = _transformSkewY;
-					globalScaleX = tweenNode.scaleX;
-					globalScaleY = tweenNode.scaleY;
-					if (__display) {
-						updateDisplay(__display, globalX, globalY, globalSkewX, globalSkewY, globalScaleX, globalScaleY);
+				
+				if (children.length > 0)
+				{
+					_transformMatrixForChildren.a = cosY;
+					_transformMatrixForChildren.b = sinY;
+					_transformMatrixForChildren.c = -sinX;
+					_transformMatrixForChildren.d = cosX;
+					_transformMatrixForChildren.tx = _transformX;
+					_transformMatrixForChildren.ty = _transformY;
+				}
+				
+				if (__parent != __armature) {
+					_globalTransformMatrix.concat(__parent._transformMatrixForChildren);
+					if (children.length > 0)
+					{
+						_transformMatrixForChildren.concat(__parent._transformMatrixForChildren);
 					}
-				//}
+				}
+				if (__display) {
+					updateDisplay(__display,_globalTransformMatrix);
+				}
 			}
 			
 			if(origin.name == "头"){

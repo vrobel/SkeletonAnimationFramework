@@ -22,7 +22,7 @@ package akdcl.skeleton.factorys {
 	use namespace skeletonNamespace;
 	
 	/**
-	 * 
+	 *
 	 * @author Akdcl
 	 */
 	public class BaseFactory extends EventDispatcher {
@@ -40,15 +40,15 @@ package akdcl.skeleton.factorys {
 			var _texture:XML = _textureData.getSubTextureXML(_fullName);
 			if (_texture) {
 				var _rect:Rectangle = new Rectangle(
-					int(_texture.attribute(ConstValues.A_X)), 
-					int(_texture.attribute(ConstValues.A_Y)), 
-					int(_texture.attribute(ConstValues.A_WIDTH)), 
+					int(_texture.attribute(ConstValues.A_X)),
+					int(_texture.attribute(ConstValues.A_Y)),
+					int(_texture.attribute(ConstValues.A_WIDTH)),
 					int(_texture.attribute(ConstValues.A_HEIGHT))
 				);
 				var _img:PivotBitmap = new PivotBitmap(_textureData.bitmap.bitmapData);
 				_img.scrollRect = _rect;
-				_img.pivotX = int(_texture.attribute(ConstValues.A_PIVOT_X));
-				_img.pivotY = int(_texture.attribute(ConstValues.A_PIVOT_Y));
+				_img.pX = int(_texture.attribute(ConstValues.A_PIVOT_X));
+				_img.pY = int(_texture.attribute(ConstValues.A_PIVOT_Y));
 				return _img;
 			}
 			return null;
@@ -168,27 +168,11 @@ package akdcl.skeleton.factorys {
 			}
 		}
 		
-		private static function updateDisplay(
-			_display:Object, 
-			_x:Number, 
-			_y:Number, 
-			_skewX:Number, 
-			_skewY:Number, 
-			_scaleX:Number, 
-			_scaleY:Number
-		):void {
-			matrix.a = _scaleX * Math.cos(_skewY);
-			matrix.b = _scaleX * Math.sin(_skewY);
-			matrix.c = -_scaleY * Math.sin(_skewX);
-			matrix.d = _scaleY * Math.cos(_skewX);
-			matrix.tx = _x;
-			matrix.ty = _y;
-			
-			if (_display is PivotBitmap) {
+		private static function updateDisplay(_display:Object, matrix:Matrix):void {
+			if (_display is PivotBitmap)
 				_display.update(matrix);
-			}else{
+			else
 				_display.transform.matrix = matrix;
-			}
 		}
 	}
 }
