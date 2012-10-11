@@ -1,9 +1,10 @@
 package akdcl.skeleton.animation {
 	import akdcl.skeleton.Bone;
+	import akdcl.skeleton.events.Event;
+	import akdcl.skeleton.events.SoundEventManager;
 	import akdcl.skeleton.objects.FrameData;
 	import akdcl.skeleton.objects.MovementBoneData;
 	import akdcl.skeleton.objects.Node;
-	
 	import akdcl.skeleton.utils.skeletonNamespace;
 	
 	use namespace skeletonNamespace;
@@ -14,6 +15,8 @@ package akdcl.skeleton.animation {
 	 */
 	final public class Tween extends ProcessBase {
 		private static const HALF_PI:Number = Math.PI * 0.5;
+		
+		private static var soundManager:SoundEventManager = SoundEventManager.getInstance();
 		
 		private var bone:Bone;
 		
@@ -148,12 +151,12 @@ package akdcl.skeleton.animation {
 				}
 				bone.changeDisplay(_displayIndex);
 				
-				/*if(currentKeyFrame.event && currentKeyFrame.armature.boneEventCallback != null){
-					_bone.armature.boneEventCallback(_keyFrame.event, _bone.info.name);
-				}*/
-				/*if(_keyFrame.sound && _bone.armature.soundEventCallback != null){
-				_bone.armature.soundEventCallback(_keyFrame.sound, _keyFrame.soundEffect);
-				}*/
+				if(currentKeyFrame.event){
+					bone.dispatchEventWith(Event.BONE_EVENT_FRAME, currentKeyFrame.event);
+				}
+				if(currentKeyFrame.sound){
+					soundManager.dispatchEventWith(Event.SOUND_FRAME, currentKeyFrame.sound);
+				}
 				currentKeyFrame = null;
 			}
 			if(isTweenKeyFrame){

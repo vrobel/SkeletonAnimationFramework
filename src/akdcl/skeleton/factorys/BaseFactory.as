@@ -2,6 +2,7 @@ package akdcl.skeleton.factorys {
 	import akdcl.skeleton.Armature;
 	import akdcl.skeleton.Bone;
 	import akdcl.skeleton.display.PivotBitmap;
+	import akdcl.skeleton.events.EventDispatcher;
 	import akdcl.skeleton.objects.AnimationData;
 	import akdcl.skeleton.objects.ArmatureData;
 	import akdcl.skeleton.objects.BoneData;
@@ -24,7 +25,7 @@ package akdcl.skeleton.factorys {
 	 * 
 	 * @author Akdcl
 	 */
-	public class BaseFactory {
+	public class BaseFactory extends EventDispatcher {
 		private static const matrix:Matrix = new Matrix();
 		
 		private static var __lastInstance:BaseFactory;

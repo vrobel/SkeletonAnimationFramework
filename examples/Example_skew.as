@@ -28,8 +28,8 @@
 				new TextureData(_sat.textureXML, _sat.textureBytes);
 			_sat.dispose();
 			
-			setTimeout(baseInit, 100);
-			setTimeout(starlingInit, 100);
+			setTimeout(baseInit, 300);
+			setTimeout(starlingInit, 300);
 		}
 		
 		private var armature:Armature;

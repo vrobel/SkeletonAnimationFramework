@@ -19,7 +19,7 @@ package akdcl.skeleton.utils {
 		public static const ANIMATIONS:String = "animations";
 		public static const ANIMATION:String = "animation";
 		public static const MOVEMENT:String = "mov";
-		public static const EVENT:String = "event";
+		public static const EVENT:String = "evt";
 		public static const FRAME:String = "f";
 
 		public static const TEXTURE_ATLAS:String = "TextureAtlas";

@@ -7,6 +7,8 @@
 		public static const MOVEMENT_EVENT_FRAME:String = "movementEventFrame";
 		public static const BONE_EVENT_FRAME:String = "boneEventFrame";
 		
+		public static const SOUND_FRAME:String = "soundFrame";
+		
 		private static var eventPool:Vector.<Event> = new <Event>[];
 		
 		internal var isStopPropagation:Boolean;
