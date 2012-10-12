@@ -4,20 +4,23 @@ package akdcl.skeleton.display{
 	import flash.geom.Matrix;
 	
 	public class PivotBitmap extends Bitmap{
-		public var pivotX:Number;
-		public var pivotY:Number;
+		//Pivot
+		public var pX:Number = 0;
+		public var pY:Number = 0;
 		
 		public function PivotBitmap(bitmapData:BitmapData = null, pixelSnapping:String = "auto", smoothing:Boolean = false){
 			super(bitmapData, pixelSnapping, smoothing);
-			
-			pivotX=0;
-			pivotY=0;
 		}
 		
 		public function update(_matrix:Matrix):void{
-			_matrix.tx -= pivotX;
-			_matrix.ty -= pivotY;
-			this.transform.matrix = _matrix;
+			if (pX != 0 || pY != 0)
+			{
+				var tx:Number = _matrix.tx;
+				var ty:Number = _matrix.ty;
+				_matrix.tx = tx - _matrix.a * pX - _matrix.c * pY;
+				_matrix.ty = ty - _matrix.b * pX - _matrix.d * pY;
+			}
+			transform.matrix = _matrix;
 		}
 	}
 }

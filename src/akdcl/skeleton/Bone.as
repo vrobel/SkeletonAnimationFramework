@@ -159,10 +159,6 @@ package akdcl.skeleton {
 				}
 			}
 			
-			if(origin.name == "头"){
-				//trace(origin, origin.parent, parent?parent.origin.name:"!!!!!");
-			}
-			
 			for each(var _child:Bone in children) {
 				_child.update();
 			}
