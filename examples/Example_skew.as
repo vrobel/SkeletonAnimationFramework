@@ -25,11 +25,13 @@
 				new SkeletonData(_sat.skeletonXML);
 			BaseFactory.lastInstance.textureData = 
 			StarlingFactory.lastInstance.textureData = 
-				new TextureData(_sat.textureXML, _sat.textureBytes);
+				new TextureData(_sat.textureXML, _sat.textureBytes, true, init);
 			_sat.dispose();
-			
-			setTimeout(baseInit, 300);
-			setTimeout(starlingInit, 300);
+		}
+		
+		private function init():void {
+			baseInit();
+			starlingInit();
 		}
 		
 		private var armature:Armature;

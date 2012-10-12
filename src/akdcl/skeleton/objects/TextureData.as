@@ -29,12 +29,14 @@ package akdcl.skeleton.objects
 		private var height:uint;
 		private var isClipToBMP:Boolean;
 		
+		private var callback:Function;
+		
 		private var __xml:XML;
 		public function get xml():XML{
 			return __xml;
 		}
 		
-		public function TextureData(_textureAtlasXML:XML, _byteArray:ByteArray, _isClipToBMP:Boolean = false) {
+		public function TextureData(_textureAtlasXML:XML, _byteArray:ByteArray, _isClipToBMP:Boolean = false, _completeCallback:Function = null) {
 			__xml = _textureAtlasXML;
 			
 			name = _textureAtlasXML.attribute(ConstValues.A_NAME);
@@ -49,6 +51,8 @@ package akdcl.skeleton.objects
 			_loader.loadBytes(_byteArray, _loaderContext);
 			
 			subTextures = {};
+			
+			callback = _completeCallback;
 		}
 		
 		public function updateBitmap():void {
@@ -102,6 +106,20 @@ package akdcl.skeleton.objects
 					updateBitmap();
 				}
 			}
+			if(callback != null){
+				switch(callback.length){
+					case 0:
+						callback();
+						break;
+					case 1:
+						callback(this);
+						break;
+					default:
+						throw Error("参数个数不正确。应为 0 个或 1 个。");
+						break;
+				}
+			}
+			callback = null;
 		}
 	}
 }

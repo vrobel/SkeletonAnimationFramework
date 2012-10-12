@@ -17,10 +17,8 @@
 		public function Example_Zombie_starling() {
 			var _sat:SkeletonAndTextureRawData = new SkeletonAndTextureRawData(new ResourcesData());
 			StarlingFactory.lastInstance.skeletonData = new SkeletonData(_sat.skeletonXML);
-			StarlingFactory.lastInstance.textureData = new TextureData(_sat.textureXML, _sat.textureBytes);
+			StarlingFactory.lastInstance.textureData = new TextureData(_sat.textureXML, _sat.textureBytes, true, starlingInit);
 			_sat.dispose();
-			
-			setTimeout(starlingInit, 100);
 		}
 		
 		private function starlingInit():void {

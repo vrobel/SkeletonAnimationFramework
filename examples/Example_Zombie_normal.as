@@ -22,14 +22,13 @@
 		public function Example_Zombie_normal() {
 			var _sat:SkeletonAndTextureRawData = new SkeletonAndTextureRawData(new ResourcesData());
 			BaseFactory.lastInstance.skeletonData = new SkeletonData(_sat.skeletonXML);
-			BaseFactory.lastInstance.textureData = new TextureData(_sat.textureXML, _sat.textureBytes);
+			BaseFactory.lastInstance.textureData = new TextureData(_sat.textureXML, _sat.textureBytes, false, baseInit);
 			_sat.dispose();
-			allArmatureNameList = BaseFactory.lastInstance.skeletonData.getSearchList();
-			armatures = [];
-			setTimeout(baseInit, 100);
 		}
 		
 		private function baseInit():void {
+			allArmatureNameList = BaseFactory.lastInstance.skeletonData.getSearchList();
+			armatures = [];
 			stage.addEventListener(MouseEvent.CLICK, onMouseClickHandler);
 			addEventListener(Event.ENTER_FRAME, onEnterFrameHandler);
 		}
