@@ -121,11 +121,13 @@ package akdcl.skeleton.factorys {
 			
 			var _length:uint = _boneData.displayLength;
 			var _displayData:DisplayData;
-			for(var _i:int = _length - 1;_i >=0;_i --){
+			for(var _i:int = 0;_i < _length;_i ++){
 				_displayData = _boneData.getDisplayData(_i);
 				_bone.changeDisplay(_i);
 				if (_displayData.isArmature) {
-					_bone.display = buildArmature(_displayData.name);
+					var _childArmature:Armature = buildArmature(_displayData.name);
+					_childArmature.origin.name += "__inChind";
+					_bone.display = _childArmature;
 				}else {
 					_bone.display = generateBoneDisplay(_armature, _bone, _displayData.name);
 				}

@@ -19,7 +19,6 @@ package akdcl.skeleton.utils {
 		public static const ANIMATIONS:String = "animations";
 		public static const ANIMATION:String = "animation";
 		public static const MOVEMENT:String = "mov";
-		public static const EVENT:String = "evt";
 		public static const FRAME:String = "f";
 
 		public static const TEXTURE_ATLAS:String = "TextureAtlas";
@@ -28,6 +27,7 @@ package akdcl.skeleton.utils {
 		public static const AT:String = "@";
 		public static const A_BONE_TYPE:String = "bT";
 		public static const A_NAME:String = "name";
+		public static const A_START:String = "st";
 		public static const A_DURATION:String = "dr";
 		public static const A_DURATION_TO:String = "to";
 		public static const A_DURATION_TWEEN:String = "drTW";

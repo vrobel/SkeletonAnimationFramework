@@ -1,4 +1,5 @@
 package akdcl.skeleton.animation {
+	import akdcl.skeleton.Armature;
 	import akdcl.skeleton.Bone;
 	import akdcl.skeleton.events.Event;
 	import akdcl.skeleton.events.SoundEventManager;
@@ -30,6 +31,8 @@ package akdcl.skeleton.animation {
 		private var currentKeyFrame:FrameData;
 		private var nextKeyFrame:FrameData;
 		private var isTweenKeyFrame:Boolean;
+		private var betweenDuration:int;
+		private var totalDuration:int;
 		
 		public function Tween(_bone:Bone) {
 			super();
@@ -123,7 +126,6 @@ package akdcl.skeleton.animation {
 						totalDuration = 0;
 						betweenDuration = 0;
 						toIndex = 0;
-						
 						break;
 				}
 			}else if (loop < -1) {
@@ -150,6 +152,12 @@ package akdcl.skeleton.animation {
 					}
 				}
 				bone.changeDisplay(_displayIndex);
+				if(currentKeyFrame.movement){
+					var _childAramture:Armature = bone as Armature || bone.childArmature;
+					if(_childAramture){
+						_childAramture.animation.play(currentKeyFrame.movement);
+					}
+				}
 				
 				if(currentKeyFrame.event){
 					bone.dispatchEventWith(Event.BONE_EVENT_FRAME, currentKeyFrame.event);
@@ -189,13 +197,13 @@ package akdcl.skeleton.animation {
 		
 		private function updateFrameData(_currentPrecent:Number, _activeFrame:Boolean = false):Number {
 			var _played:Number = duration * _currentPrecent;
-			var _length:int = movementBoneData.length;
 			var _fromIndex:int;
 			var _from:FrameData;
 			var _to:FrameData;
 			var _isListEnd:Boolean;
 			//播放头到达当前帧的前面或后面则重新寻找当前帧
 			if (_played >= totalDuration || _played < totalDuration - betweenDuration) {
+				var _length:int = movementBoneData.length;
 				do {
 					betweenDuration = movementBoneData.getData(toIndex).duration;
 					totalDuration += betweenDuration;

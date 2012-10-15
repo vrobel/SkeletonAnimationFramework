@@ -24,8 +24,6 @@ package akdcl.skeleton.animation {
 		protected var tweenEasing:int;
 		
 		protected var toIndex:int;
-		protected var betweenDuration:int;
-		protected var totalDuration:int;
 		
 		protected var __scale:Number;
 		public function get scale():Number {

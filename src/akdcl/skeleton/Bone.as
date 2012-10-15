@@ -3,9 +3,9 @@ package akdcl.skeleton {
 	import akdcl.skeleton.events.EventDispatcher;
 	import akdcl.skeleton.objects.BoneData;
 	import akdcl.skeleton.objects.Node;
-	import flash.geom.Matrix;
-	
 	import akdcl.skeleton.utils.skeletonNamespace;
+	
+	import flash.geom.Matrix;
 	
 	use namespace skeletonNamespace;
 	
@@ -78,6 +78,10 @@ package akdcl.skeleton {
 			}
 		}
 		
+		public function get childArmature():Armature{
+			return displayList[displayIndex] as Armature;
+		}
+		
 		skeletonNamespace function changeDisplay(_displayIndex:int):void {
 			if(displayIndex == _displayIndex){
 				return;
@@ -119,7 +123,6 @@ package akdcl.skeleton {
 				var _transformY:Number = origin.y + node.y + tweenNode.y;
 				var _transformSkewX:Number = origin.skewX + node.skewX + tweenNode.skewX;
 				var _transformSkewY:Number = origin.skewY + node.skewY + tweenNode.skewY;
-				
 				
 				//Note: this formula of transform is defined by Flash pro
 				var cosX:Number = Math.cos(_transformSkewX);

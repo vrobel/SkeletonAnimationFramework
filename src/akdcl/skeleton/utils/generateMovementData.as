@@ -2,6 +2,7 @@ package akdcl.skeleton.utils {
 	import akdcl.skeleton.objects.ArmatureData;
 	import akdcl.skeleton.objects.BoneData;
 	import akdcl.skeleton.objects.MovementData;
+	import akdcl.skeleton.objects.MovementFrameData;
 	
 	/**
 	 * ...
@@ -32,6 +33,23 @@ package akdcl.skeleton.utils {
 					_movementData.getData(_boneName)
 				),
 				_boneName
+			);
+		}
+		_xmlList = _movementXML.elements(ConstValues.FRAME);
+		for each(var _frameXML:XML in _xmlList) {
+			var _frameData:MovementFrameData = _movementData.getFrame(_frameXML.childIndex());
+			if(!_frameData){
+				_frameData = new MovementFrameData();
+			}
+			
+			_frameData.start = int(_frameXML.attribute(ConstValues.A_START));
+			_frameData.duration = int(_frameXML.attribute(ConstValues.A_DURATION));
+			_frameData.event = _frameXML.attribute(ConstValues.A_EVENT);
+			_frameData.movement = _frameXML.attribute(ConstValues.A_MOVEMENT);
+			_frameData.sound = _frameXML.attribute(ConstValues.A_SOUND);
+			_movementData.addFrameData(
+				_frameData,
+				_frameXML.childIndex()
 			);
 		}
 		return _movementData;

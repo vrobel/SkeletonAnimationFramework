@@ -3,9 +3,11 @@ package akdcl.skeleton.animation{
 	import akdcl.skeleton.Armature;
 	import akdcl.skeleton.Bone;
 	import akdcl.skeleton.events.Event;
+	import akdcl.skeleton.events.SoundEventManager;
 	import akdcl.skeleton.objects.AnimationData;
 	import akdcl.skeleton.objects.MovementBoneData;
 	import akdcl.skeleton.objects.MovementData;
+	import akdcl.skeleton.objects.MovementFrameData;
 	import akdcl.skeleton.utils.skeletonNamespace;
 	
 	use namespace skeletonNamespace;
@@ -15,6 +17,8 @@ package akdcl.skeleton.animation{
 	 * @author Akdcl
 	 */
 	final public class Animation extends ProcessBase {
+		private static var soundManager:SoundEventManager = SoundEventManager.getInstance();
+		
 		public var movementList:Array;
 		public var movementID:String;
 		
@@ -23,6 +27,7 @@ package akdcl.skeleton.animation{
 		
 		private var animationData:AnimationData;
 		private var movementData:MovementData;
+		private var currentFrameData:MovementFrameData;
 		
 		private var armature:Armature;
 		
@@ -61,7 +66,7 @@ package akdcl.skeleton.animation{
 			if (!_movementData) {
 				return;
 			}
-			totalDuration = 0;
+			currentFrameData = null;
 			toIndex = 0;
 			movementID = _movementID as String;
 			movementData = _movementData;
@@ -127,7 +132,6 @@ package akdcl.skeleton.animation{
 							//播放速度太快或durationTween时间太短，进入下面的case
 						}else {
 							totalFrames = durationTween;
-							totalDuration = 0;
 							armature.dispatchEventWith(Event.START, movementID);
 							break;
 						}
@@ -139,47 +143,51 @@ package akdcl.skeleton.animation{
 						break;
 					case LIST_LOOP_START:
 						loop = 0;
+						totalFrames = durationTween > 0?durationTween:1;
 						currentPrecent %= 1;
-						totalFrames = durationTween;
-						totalDuration = 0;
 						armature.dispatchEventWith(Event.START, movementID);
 						break;
 					default:
 						//继续循环
 						loop += int(currentPrecent);
 						currentPrecent %= 1;
-						totalDuration = 0;
+						toIndex = 0;
 						armature.dispatchEventWith(Event.LOOP_COMPLETE, movementID);
 						break;
 				}
 			}
 			if (loop >= LIST) {
-				//多关键帧动画过程
-				//updateFrameData(currentPrecent);
+				updateFrameData(currentPrecent);
 			}
 		}
 		
 		private function updateFrameData(_currentPrecent:Number):void {
-			/*var _length:int = movementData.length;
+			var _length:uint = movementData.frameLength;
+			if(_length == 0){
+				return;
+			}
 			var _played:Number = duration * _currentPrecent;
-			var _fromIndex:int;
-			var _from:FrameData;
-			var _to:FrameData;
 			//播放头到达当前帧的前面或后面则重新寻找当前帧
-			if (_played <= totalDuration - betweenDuration || _played > totalDuration) {
-				do {
-					betweenDuration = movementData.getFrame(toIndex).duration;
-					totalDuration += betweenDuration;
-					_fromIndex = toIndex;
+			if (!currentFrameData || _played >= currentFrameData.duration + currentFrameData.start || _played < currentFrameData.start) {
+				while (true) {
+					currentFrameData =  movementData.getFrame(toIndex);
 					if (++toIndex >= _length) {
 						toIndex = 0;
 					}
-				}while (_played >= totalDuration);
-				_fromIndex, toIndex
-				if (onAnimation != null) {
-					onAnimation(IN_FRAME, aniIDNow, movementData.getFrame[_fromIndex]);
+					if(currentFrameData && _played >= currentFrameData.start && _played < currentFrameData.duration + currentFrameData.start){
+						break;
+					}
 				}
-			}*/
+				if(currentFrameData.event){
+					armature.dispatchEventWith(Event.MOVEMENT_EVENT_FRAME, currentFrameData.event);
+				}
+				if(currentFrameData.sound){
+					soundManager.dispatchEventWith(Event.SOUND_FRAME, currentFrameData.sound);
+				}
+				if(currentFrameData.movement){
+					play(currentFrameData.movement);
+				}
+			}
 		}
 	}
 	
