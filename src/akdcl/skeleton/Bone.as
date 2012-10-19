@@ -64,6 +64,7 @@ package akdcl.skeleton {
 			
 			if (_display is Armature) {
 				displayList[displayIndex] = _display;
+				childArmature.origin.z = origin.z;
 				addChild(_display as Bone);
 			}else if (_display) {
 				displayList[displayIndex] = _display;

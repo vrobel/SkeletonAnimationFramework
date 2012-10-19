@@ -143,6 +143,7 @@ package akdcl.skeleton.animation {
 			if(currentKeyFrame){
 				//arrived
 				var _displayIndex:int = currentKeyFrame.displayIndex;
+				var _childAramture:Armature = bone.childArmature;
 				if(_displayIndex >= 0){
 					if(bone.origin.z != currentKeyFrame.z){
 						bone.origin.z = currentKeyFrame.z;
@@ -152,9 +153,9 @@ package akdcl.skeleton.animation {
 					}
 				}
 				bone.changeDisplay(_displayIndex);
-				if(currentKeyFrame.movement){
-					var _childAramture:Armature = bone as Armature || bone.childArmature;
-					if(_childAramture){
+				if(_childAramture){
+					_childAramture.origin.z = currentKeyFrame.z;
+					if(currentKeyFrame.movement){
 						_childAramture.animation.play(currentKeyFrame.movement);
 					}
 				}
